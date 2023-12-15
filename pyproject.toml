@@ -5,7 +5,6 @@ description = ""
 authors = [{ name = "ysur57", email = "rus.muratow@gmail.com" }]
 dependencies = [
     "pydantic>=2.5.2",
-    "sqlalchemy[asyncio]>=2.0.23",
     "asyncpg>=0.29.0",
     "alembic>=1.12.1",
     "python-dotenv>=1.0.0",
@@ -14,6 +13,8 @@ dependencies = [
     "motor>=3.3.2",
     "neo4j>=5.15.0",
     "aioinject>=0.17.0",
+    "httpx>=0.25.2",
+    "selectolax>=0.3.17",
 ]
 requires-python = ">=3.12"
 readme = "README.md"
