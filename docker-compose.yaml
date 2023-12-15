@@ -1,0 +1,16 @@
+version: '3.1'
+
+services:
+  db:
+    image: neo4j:enterprise
+    restart: always
+    ports:
+      - "7474:7474"
+      - "7687:7687"
+    environment:
+      NEO4J_ACCEPT_LICENSE_AGREEMENT: "yes"
+      NEO4J_AUTH: "neo4j/rootroot"
+      EXTENDED_CONF: "yes"
+      NEO4J_EDITION: "docker_compose"
+    volumes:
+      - ./data/neo4j:/data

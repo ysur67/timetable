@@ -1,0 +1,24 @@
+version: '3'
+
+tasks:
+  lint:
+    cmds:
+      - "ruff check . --fix --show-fixes"
+      - "black ."
+      - "ruff check . --fix --show-fixes"
+      - "mypy ."
+      # - "deptry ."
+      # - "isort ."
+
+  test:
+    cmds:
+      - "coverage run"
+      - "coverage report"
+
+  makemigrations:
+    cmds:
+      - alembic revision --autogenerate
+
+  migrate:
+    cmds:
+      - alembic upgrade head

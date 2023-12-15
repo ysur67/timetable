@@ -1,0 +1,127 @@
+[project]
+name = "schedule"
+version = "0.1.0"
+description = ""
+authors = [{ name = "ysur57", email = "rus.muratow@gmail.com" }]
+dependencies = [
+    "pydantic>=2.5.2",
+    "sqlalchemy[asyncio]>=2.0.23",
+    "asyncpg>=0.29.0",
+    "alembic>=1.12.1",
+    "python-dotenv>=1.0.0",
+    "result>=0.14.0",
+    "pydantic-settings>=2.1.0",
+    "motor>=3.3.2",
+    "neo4j>=5.15.0",
+    "aioinject>=0.17.0",
+]
+requires-python = ">=3.12"
+readme = "README.md"
+license = { text = "MIT" }
+
+[build-system]
+requires = ["pdm-backend"]
+build-backend = "pdm.backend"
+
+[tool.pdm.dev-dependencies]
+dev = [
+    "pytest>=7.4.3",
+    "mypy>=1.7.1",
+    "ruff>=0.1.6",
+    "black>=23.11.0",
+    "coverage>=7.3.2",
+    "isort>=5.12.0",
+]
+
+
+[tool.pytest.ini_options]
+pythonpath = "src"
+filterwarnings = [
+    "ignore:'cgi' is deprecated and slated for removal in Python 3.13",
+    "ignore::sqlalchemy.exc.SADeprecationWarning",
+]
+
+[tool.coverage.run]
+source = ["src"]
+omit = ["src/impls/alchemy/alembic/*", "tests/"]
+command_line = "-m pytest -vv"
+concurrency = ["greenlet", "thread"]
+
+[tool.coverage.report]
+omit = ["src/impls/alchemy/alembic/*", "tests/"]
+exclude_lines = [
+    "pragma: no cover",
+    "raise *",
+    "if TYPE_CHECKING:",
+    "assert_never*",
+    "sentry_sdk.capture_event",
+    # Match stubs
+    "^\\s*\\.\\.\\.$",
+]
+show_missing = true
+skip_covered = true
+skip_empty = true
+precision = 2
+
+
+[tool.mypy]
+python_version = "3.12"
+plugins = ["pydantic.mypy"]
+
+follow_imports = "normal"
+ignore_missing_imports = true
+exclude = ["venv"]
+check_untyped_defs = true
+disallow_untyped_calls = true
+disallow_untyped_defs = true
+disallow_incomplete_defs = true
+disallow_any_generics = true
+no_implicit_optional = true
+
+warn_redundant_casts = true
+warn_unused_ignores = true
+warn_return_any = true
+warn_unreachable = true
+
+strict_optional = true
+strict_equality = true
+
+
+[tool.ruff]
+target-version = "py312"
+src = ["src", "tests"]
+select = ["ALL"]
+fixable = ["F", "E", "W", "I", "COM", "UP", "RUF"]
+ignore = [
+    "UP017",  # Use `datetime.UTC` alias, This clashes with imported `datetime` class
+    "E501",   # Line Length
+    "A003",   # Class attribute ... is shadowing a python builtin
+    "ANN101", # Missing type annotation for `self` in method
+    "ANN102", # Missing type annotation for `cls` in classmethod
+    "D",      # pydocstyle
+    "PD",     # pandas-vet
+    "INP",
+    "TCH001", # Move import into type-checking block
+    "TCH002", # Move third-party import into a type-checking block
+    "TCH003", # Found multiple type checking blocks
+    "RUF001",
+    "RUF002",
+    "RUF003",
+    "EXE002",
+    "TD003",
+    "FIX002",
+]
+
+
+[tool.ruff.per-file-ignores]
+"tests/*" = ["S101", "S311"]
+"tests/*/test_*.py" = ["PLR0913"]
+
+
+[tool.ruff.pep8-naming]
+classmethod-decorators = [
+    "classmethod",
+    "pydantic.validator",
+    "pydantic.root_validator",
+]
+staticmethod-decorators = ["staticmethod"]
