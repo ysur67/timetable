@@ -1,4 +1,4 @@
-from collections.abc import Iterable
+from collections.abc import Sequence
 from typing import Final, Protocol, final
 
 import httpx
@@ -9,7 +9,7 @@ from scraping.schemas.group import GroupSchema
 
 
 class GroupsClient(Protocol):
-    async def get_all(self, level: EducationalLevelSchema) -> Iterable[GroupSchema]:
+    async def get_all(self, level: EducationalLevelSchema) -> Sequence[GroupSchema]:
         ...
 
 
@@ -20,12 +20,12 @@ class HttpGroupsClient(GroupsClient):
     def __init__(self, client: httpx.AsyncClient) -> None:
         self._client = client
 
-    async def get_all(self, level: EducationalLevelSchema) -> Iterable[GroupSchema]:
+    async def get_all(self, level: EducationalLevelSchema) -> Sequence[GroupSchema]:
         url = f"{self.BASE_URL}?tmenu={12}&cod={level.code}"
         response = await self._client.get(url)
         return self._scrape_groups(HTMLParser(response.text))
 
-    def _scrape_groups(self, parser: HTMLParser) -> Iterable[GroupSchema]:
+    def _scrape_groups(self, parser: HTMLParser) -> Sequence[GroupSchema]:
         result: list[GroupSchema] = []
         for node in parser.tags("option"):
             title = node.text(deep=False).strip()

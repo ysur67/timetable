@@ -1,6 +1,11 @@
+import uuid
+from typing import NewType
+
 from core.models import Model
+
+TeacherId = NewType("TeacherId", uuid.UUID)
 
 
 class Teacher(Model):
-    id: int
+    id: TeacherId
     name: str
