@@ -5,7 +5,7 @@
 groups = ["default", "dev"]
 strategy = ["cross_platform"]
 lock_version = "4.4"
-content_hash = "sha256:996f883c2c42a0112f50ac6fd878ad14b7f888f3386d249191c4c58d0fec1d7c"
+content_hash = "sha256:79f22826187a33b093f435021eca9c330abff6c71da6125c88c83a86316841f0"
 
 [[package]]
 name = "aiohttp"
@@ -91,7 +91,7 @@ files = [
 
 [[package]]
 name = "anyio"
-version = "4.1.0"
+version = "4.2.0"
 requires_python = ">=3.8"
 summary = "High level compatibility layer for multiple asynchronous event loop implementations"
 dependencies = [
@@ -99,8 +99,8 @@ dependencies = [
     "sniffio>=1.1",
 ]
 files = [
-    {file = "anyio-4.1.0-py3-none-any.whl", hash = "sha256:56a415fbc462291813a94528a779597226619c8e78af7de0507333f700011e5f"},
-    {file = "anyio-4.1.0.tar.gz", hash = "sha256:5a0bec7085176715be77df87fc66d6c9d70626bd752fcc85f57cdbee5b3760da"},
+    {file = "anyio-4.2.0-py3-none-any.whl", hash = "sha256:745843b39e829e108e518c489b31dc757de7d2131d53fac32bd8df268227bfee"},
+    {file = "anyio-4.2.0.tar.gz", hash = "sha256:e1875bb4b4e2de1669f4bc7869b6d3f54231cdced71605e6e64c9be77e3be50f"},
 ]
 
 [[package]]
@@ -213,6 +213,32 @@ summary = "DNS toolkit"
 files = [
     {file = "dnspython-2.4.2-py3-none-any.whl", hash = "sha256:57c6fbaaeaaf39c891292012060beb141791735dbb4004798328fc2c467402d8"},
     {file = "dnspython-2.4.2.tar.gz", hash = "sha256:8dcfae8c7460a2f84b4072e26f1c9f4101ca20c071649cb7c34e8b6a93d58984"},
+]
+
+[[package]]
+name = "factory-boy"
+version = "3.3.0"
+requires_python = ">=3.7"
+summary = "A versatile test fixtures replacement based on thoughtbot's factory_bot for Ruby."
+dependencies = [
+    "Faker>=0.7.0",
+]
+files = [
+    {file = "factory_boy-3.3.0-py2.py3-none-any.whl", hash = "sha256:a2cdbdb63228177aa4f1c52f4b6d83fab2b8623bf602c7dedd7eb83c0f69c04c"},
+    {file = "factory_boy-3.3.0.tar.gz", hash = "sha256:bc76d97d1a65bbd9842a6d722882098eb549ec8ee1081f9fb2e8ff29f0c300f1"},
+]
+
+[[package]]
+name = "faker"
+version = "21.0.0"
+requires_python = ">=3.8"
+summary = "Faker is a Python package that generates fake data for you."
+dependencies = [
+    "python-dateutil>=2.4",
+]
+files = [
+    {file = "Faker-21.0.0-py3-none-any.whl", hash = "sha256:ff61cca42547795bee8a11319792a8fee6d0f0cd191e831f7f3050c5851fcd8a"},
+    {file = "Faker-21.0.0.tar.gz", hash = "sha256:2d8a350e952225a145307d7461881c44a1c9320e90fbe8bd903d5947f133f3ec"},
 ]
 
 [[package]]
@@ -585,6 +611,19 @@ files = [
 ]
 
 [[package]]
+name = "python-dateutil"
+version = "2.8.2"
+requires_python = "!=3.0.*,!=3.1.*,!=3.2.*,>=2.7"
+summary = "Extensions to the standard Python datetime module"
+dependencies = [
+    "six>=1.5",
+]
+files = [
+    {file = "python-dateutil-2.8.2.tar.gz", hash = "sha256:0123cacc1627ae19ddf3c27a5de5bd67ee4586fbdd6440d9748f8abb483d3e86"},
+    {file = "python_dateutil-2.8.2-py2.py3-none-any.whl", hash = "sha256:961d03dc3453ebbc59dbdea9e4e11c5651520a876d0f4db161e8674aae935da9"},
+]
+
+[[package]]
 name = "python-dotenv"
 version = "1.0.0"
 requires_python = ">=3.8"
@@ -657,6 +696,16 @@ files = [
 ]
 
 [[package]]
+name = "six"
+version = "1.16.0"
+requires_python = ">=2.7, !=3.0.*, !=3.1.*, !=3.2.*"
+summary = "Python 2 and 3 compatibility utilities"
+files = [
+    {file = "six-1.16.0-py2.py3-none-any.whl", hash = "sha256:8abb2f1d86890a2dfb989f9a77cfcfd3e47c2a354b01111771326f8aa26e0254"},
+    {file = "six-1.16.0.tar.gz", hash = "sha256:1e61c37477a1626458e36f7b1d82aa5c9b094fa4802892072e49de9c60c4c926"},
+]
+
+[[package]]
 name = "sniffio"
 version = "1.3.0"
 requires_python = ">=3.7"
@@ -674,29 +723,6 @@ summary = "Database Abstraction Library"
 dependencies = [
     "greenlet!=0.4.17; platform_machine == \"aarch64\" or (platform_machine == \"ppc64le\" or (platform_machine == \"x86_64\" or (platform_machine == \"amd64\" or (platform_machine == \"AMD64\" or (platform_machine == \"win32\" or platform_machine == \"WIN32\")))))",
     "typing-extensions>=4.2.0",
-]
-files = [
-    {file = "SQLAlchemy-2.0.23-cp312-cp312-macosx_10_9_x86_64.whl", hash = "sha256:d0f7fb0c7527c41fa6fcae2be537ac137f636a41b4c5a4c58914541e2f436b45"},
-    {file = "SQLAlchemy-2.0.23-cp312-cp312-macosx_11_0_arm64.whl", hash = "sha256:7c424983ab447dab126c39d3ce3be5bee95700783204a72549c3dceffe0fc8f4"},
-    {file = "SQLAlchemy-2.0.23-cp312-cp312-manylinux_2_17_aarch64.manylinux2014_aarch64.whl", hash = "sha256:f508ba8f89e0a5ecdfd3761f82dda2a3d7b678a626967608f4273e0dba8f07ac"},
-    {file = "SQLAlchemy-2.0.23-cp312-cp312-manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:6463aa765cf02b9247e38b35853923edbf2f6fd1963df88706bc1d02410a5577"},
-    {file = "SQLAlchemy-2.0.23-cp312-cp312-musllinux_1_1_aarch64.whl", hash = "sha256:e599a51acf3cc4d31d1a0cf248d8f8d863b6386d2b6782c5074427ebb7803bda"},
-    {file = "SQLAlchemy-2.0.23-cp312-cp312-musllinux_1_1_x86_64.whl", hash = "sha256:fd54601ef9cc455a0c61e5245f690c8a3ad67ddb03d3b91c361d076def0b4c60"},
-    {file = "SQLAlchemy-2.0.23-cp312-cp312-win32.whl", hash = "sha256:42d0b0290a8fb0165ea2c2781ae66e95cca6e27a2fbe1016ff8db3112ac1e846"},
-    {file = "SQLAlchemy-2.0.23-cp312-cp312-win_amd64.whl", hash = "sha256:227135ef1e48165f37590b8bfc44ed7ff4c074bf04dc8d6f8e7f1c14a94aa6ca"},
-    {file = "SQLAlchemy-2.0.23-py3-none-any.whl", hash = "sha256:31952bbc527d633b9479f5f81e8b9dfada00b91d6baba021a869095f1a97006d"},
-    {file = "SQLAlchemy-2.0.23.tar.gz", hash = "sha256:c1bda93cbbe4aa2aa0aa8655c5aeda505cd219ff3e8da91d1d329e143e4aff69"},
-]
-
-[[package]]
-name = "sqlalchemy"
-version = "2.0.23"
-extras = ["asyncio"]
-requires_python = ">=3.7"
-summary = "Database Abstraction Library"
-dependencies = [
-    "greenlet!=0.4.17",
-    "sqlalchemy==2.0.23",
 ]
 files = [
     {file = "SQLAlchemy-2.0.23-cp312-cp312-macosx_10_9_x86_64.whl", hash = "sha256:d0f7fb0c7527c41fa6fcae2be537ac137f636a41b4c5a4c58914541e2f436b45"},

@@ -33,3 +33,18 @@ class HttpGroupsClient(GroupsClient):
             if title:
                 result.append(GroupSchema(title=title, code=code))
         return result
+
+
+@final
+class DummyGroupsClient(GroupsClient):
+    def __init__(self, response_size: int) -> None:
+        self.size: Final = response_size
+
+    async def get_all(
+        self,
+        level: EducationalLevelSchema,  # noqa: ARG002
+    ) -> Sequence[GroupSchema]:
+        return [
+            GroupSchema(title=f"Group: {index}", code=str(index))
+            for index in range(self.size)
+        ]

@@ -22,6 +22,7 @@ class NeoSettings(BaseSettings):
     port: int
     username: str
     password: str
+    name: str
 
     @property
     def url(self) -> str:

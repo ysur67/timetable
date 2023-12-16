@@ -16,7 +16,9 @@ async def get_driver(settings: NeoSettings) -> AsyncIterator[AsyncDriver]:
 
 
 @contextlib.asynccontextmanager
-async def get_session(driver: AsyncDriver) -> AsyncIterator[AsyncSession]:
-    manager = AsyncGraphDatabase.bookmark_manager()
-    async with driver.session(bookmark_manager=manager) as session:
+async def get_session(
+    driver: AsyncDriver,
+    settings: NeoSettings,
+) -> AsyncIterator[AsyncSession]:
+    async with driver.session(database=settings.name) as session:
         yield session

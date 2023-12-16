@@ -58,7 +58,8 @@ class NeoGroupRepository(GroupRepository):
                             id: group.id,
                             title: group.title,
                             code: group.external_id
-                        })-[:BELONGS_TO]->(e)
+                        }
+                    )-[:BELONGS_TO]->(e)
                 )
             """
             await self._session.run(
