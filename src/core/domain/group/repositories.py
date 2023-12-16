@@ -13,3 +13,6 @@ class GroupRepository(Protocol):
         groups: Iterable[Group],
     ) -> Iterable[Group]:
         ...
+
+    async def get_by_title(self, title: str) -> Group | None:
+        ...

@@ -72,3 +72,28 @@ class NeoGroupRepository(GroupRepository):
                 },
             )
         return groups
+
+    async def get_by_title(self, title: str) -> Group | None:
+        stmt = """
+            MATCH (g:Group)-[:BELONGS_TO]-(e:EducationalLevel)
+                where toLower(g.title) = $group
+            RETURN
+                group.id as `id`,
+                group.title as `title`,
+                group.code as `code`,
+                e.id as `educational_level_id`,
+                e.title as `educational_level_title`,
+                e.code as `educational_level_code`;
+        """
+        result = await self._session.run(stmt, parameters={"group": title})
+        record = await result.single()
+        return Group(
+            id=record["id"],
+            external_id=record["code"],
+            title=record["title"],
+            level=EducationalLevel(
+                id=record["educational_level_id"],
+                title=record["educational_level_title"],
+                code=record["educational_level_code"],
+            ),
+        )
