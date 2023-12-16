@@ -44,9 +44,8 @@ class NeoGroupRepository(GroupRepository):
         self,
         groups: Iterable[Group],
     ) -> Iterable[Group]:
-        groups_by_level: dict[EducationalLevel, list[Group]] = collections.defaultdict(
-            list,
-        )
+        groups_by_level: dict[EducationalLevel, list[Group]]
+        groups_by_level = collections.defaultdict(list)
         for group in groups:
             groups_by_level[group.level].append(group)
         for level, related_groups in groups_by_level.items():
