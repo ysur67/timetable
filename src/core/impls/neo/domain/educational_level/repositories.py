@@ -13,7 +13,13 @@ class NeoEducationalLevelRepository(EducationalLevelRepository):
         self._session = session
 
     async def get_all(self) -> Iterable[EducationalLevel]:
-        stmt = "match (level:EducationalLevel) return level.*"
+        stmt = """
+            match (level:EducationalLevel)
+            return
+                level.id as `id`,
+                level.title as `title`,
+                level.code as `code`;
+        """
         result = await self._session.run(stmt)
         levels = await result.data()
         return [EducationalLevel.model_validate(el) for el in levels]

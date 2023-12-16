@@ -29,6 +29,7 @@ class HttpGroupsClient(GroupsClient):
         result: list[GroupSchema] = []
         for node in parser.tags("option"):
             title = node.text(deep=False).strip()
+            code = node.attributes.get("value", "UNDEFINED_CODE")
             if title:
-                result.append(GroupSchema(title=title))
+                result.append(GroupSchema(title=title, code=code))
         return result
