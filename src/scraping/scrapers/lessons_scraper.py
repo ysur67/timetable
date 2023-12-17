@@ -6,10 +6,17 @@ from core.domain.group.repositories import GroupRepository
 from core.domain.lesson.services import LessonService
 from core.domain.subject.services import SubjectService
 from core.domain.teacher.services import TeacherService
-from core.models.classroom import Classroom, ClassroomId
-from core.models.lesson import Lesson, LessonId
-from core.models.subject import Subject, SubjectId
-from core.models.teacher import Teacher, TeacherId
+from core.models import (
+    Classroom,
+    ClassroomId,
+    Lesson,
+    LessonId,
+    Model,
+    Subject,
+    SubjectId,
+    Teacher,
+    TeacherId,
+)
 from lib.logger import get_default_logger
 from scraping.clients.lessons.lessons_client import LessonsClient
 from scraping.schemas.lesson import LessonSchema
@@ -47,9 +54,13 @@ class LessonsScraper:
                         Lesson.__name__,
                     )
                     continue
+                self._logger.info("Processing %s", schema)
                 classroom = await self._get_classroom(schema)
+                self._log_object(Classroom, classroom)
                 subject = await self._get_subject(schema)
+                self._log_object(Subject, subject)
                 teacher = await self._get_teacher(schema)
+                self._log_object(Teacher, classroom)
                 lesson = Lesson(
                     id=LessonId(uuid.uuid4()),
                     date_=schema.date_,
@@ -62,6 +73,7 @@ class LessonsScraper:
                     classroom=classroom,
                     note=schema.note,
                 )
+                self._logger.info("Creating %s", lesson)
                 await self._lesson_service.get_or_create(lesson)
 
     async def _get_teacher(self, schema: LessonSchema) -> Teacher | None:
@@ -92,4 +104,18 @@ class LessonsScraper:
                 id=ClassroomId(uuid.uuid4()),
                 title=schema.classroom.title,
             ),
+        )
+
+    def _log_object(
+        self,
+        klass: type[Model],
+        model: Model | None = None,
+    ) -> None:
+        if model is None:
+            self._logger.info("Couldn't find %s", klass.__name__)
+            return
+        self._logger.info(
+            "Found %s %s",
+            klass.__name__,
+            model,
         )
