@@ -25,7 +25,7 @@ class _LessonsRequestParams(BaseModel):
     exam: str = "0"
     datafrom: str
     dataend: str
-    fromo: str = "2"
+    formo: str = "2"
     formob: str = "0"
     prdis: str = "0"
 
@@ -85,10 +85,10 @@ class HttpLessonsClient(LessonsClient):
     ) -> Sequence[LessonSchema]:
         if table.html is None:
             return []
-        table_parser = HTMLParser(table.html)
-        rows = table_parser.tags("tr")
+        rows = table.css("tr")
         if len(rows) < 1:
             return []
+        rows.pop(0)
         return reduce(
             operator.concat,
             [self._get_lesson_from_single_row(row, lesson_date) for row in rows],
@@ -101,8 +101,7 @@ class HttpLessonsClient(LessonsClient):
     ) -> Sequence[LessonSchema]:
         if row.html is None:
             return []
-        parser = HTMLParser(row.html)
-        tds = parser.tags("td")
+        tds = row.css("td")
         if len(tds) < 1:
             return []
         # первый элемент - это номер строки
@@ -228,7 +227,7 @@ class HttpLessonsClient(LessonsClient):
     async def _get_html_parser(self, params: _LessonsRequestParams) -> HTMLParser:
         response = await self._client.post(
             self.BASE_URL,
-            json=params.model_dump(mode="json"),
+            data=params.model_dump(mode="json"),
         )
         response.raise_for_status()
         return HTMLParser(response.text)
@@ -236,7 +235,7 @@ class HttpLessonsClient(LessonsClient):
     def _build_request_params(self, level: EducationalLevel) -> _LessonsRequestParams:
         return _LessonsRequestParams(
             ucstep=level.code,
-            datafrom=_LessonsRequestParams.date_to_request(date(2023, 9, 1)),
+            datafrom=_LessonsRequestParams.date_to_request(date(2023, 12, 17)),
             dataend=_LessonsRequestParams.date_to_request(date(2023, 12, 30)),
         )
 
