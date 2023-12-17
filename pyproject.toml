@@ -46,12 +46,16 @@ filterwarnings = [
 
 [tool.coverage.run]
 source = ["src"]
-omit = ["src/impls/alchemy/alembic/*", "tests/"]
+omit = ["tests/"]
 command_line = "-m pytest -vv"
 concurrency = ["greenlet", "thread"]
 
 [tool.coverage.report]
-omit = ["src/impls/alchemy/alembic/*", "tests/"]
+omit = [
+    "tests/",
+    "src/scraping/clients/groups/http_client.py",
+    "src/scraping/clients/lessons/http_client.py",
+]
 exclude_lines = [
     "pragma: no cover",
     "raise *",

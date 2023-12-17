@@ -2,8 +2,8 @@ import pytest
 from neo4j import AsyncSession
 
 from core.models.educational_level import EducationalLevel
-from scraping.clients.groups_client import DummyGroupsClient
 from scraping.scrapers.groups_scraper import GroupsScraper
+from tests.scraping.dummies.groups_client import DummyGroupsClient
 
 pytestmark = [pytest.mark.anyio]
 

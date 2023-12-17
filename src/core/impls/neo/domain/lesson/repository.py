@@ -4,34 +4,39 @@ from typing import final
 from neo4j import AsyncSession
 
 from core.domain.lesson.repository import LessonRepository
+from core.impls.neo.mappers.neo_record_to_domain_mapper import NeoRecordToDomainMapper
 from core.models.lesson import Lesson
-from scraping.clients import lessons_client
-from scraping.schemas.lesson import LessonSchema
 
 
 @final
 class NeoLessonRepository(LessonRepository):
-    def __init__(self, session: AsyncSession) -> None:
+    def __init__(self, session: AsyncSession, mapper: NeoRecordToDomainMapper) -> None:
         self._session = session
+        self._mapper = mapper
 
     async def get(self, lesson: Lesson) -> Lesson | None:
-        subject = lesson.subject.title if lesson.subject else "None"
-        teacher = lesson.teacher.name if lesson.teacher else "None"
-        classroom = lesson.classroom.name if lesson.classroom else "None"
-        date_ = lesson.date_.isoformat()
-        hash_ = hashlib.sha512(
-            lesson.group.title + subject + teacher + classroom + date_,
-        )
         stmt = """
-            match (l:Lesson)-[:TAUGHT_TO]-(g:Group)
-            optional match
-                (l:Lesson)-[:TOPIC_OF]-(s:Subject),
-                (l:Lesson)-[:TAUGHT_BY]-(t:Teacher),
-                (l:Lesson)-[:HELD_IN]-(c:Classroom)
-            return l, s, t, c;
+            match (lesson:Lesson)-[:TAUGHT_TO]-(group:Group)-[:BELONGS_TO]-(educational_level:EducationalLevel)
+                where lesson.hash = $hash
+            optional match (lesson:Lesson)-[:TOPIC_OF]-(subject:Subject)
+            optional match (lesson:Lesson)-[:TAUGHT_BY]-(teacher:Teacher)
+            optional match (lesson:Lesson)-[:HELD_IN]-(classroom:Classroom)
+            return
+                lesson,
+                group,
+                subject,
+                teacher,
+                classroom,
+                educational_level;
         """
-        result = await self._session.run(stmt)
-        return result
+        result = await self._session.run(
+            stmt,
+            parameters={"hash": self._create_lesson_hash(lesson)},
+        )
+        record = await result.single()
+        if record is None:
+            return None
+        return self._mapper.map_lesson(record.data())
 
     # TODO: Воспользоваться merge?
     async def create(self, lesson: Lesson) -> Lesson:
@@ -43,15 +48,18 @@ class NeoLessonRepository(LessonRepository):
                 date: $lesson.date_,
                 time_start: $lesson.time_start,
                 time_end: $lesson.time_end,
-                link: $lesson.link
-            })-[:TAUGHT_TO]-(g);
+                link: $lesson.link,
+                note: $lesson.note,
+                hash: $hash
+            })-[:TAUGHT_TO]->(g);
         """
         lesson_dict = lesson.model_dump(mode="json")
         _ = await self._session.run(
             create_stmt,
             parameters={
-                "group": lesson_dict,
-                "lesson": lesson.model_dump(mode="json"),
+                "group": lesson.group.model_dump(mode="json"),
+                "lesson": lesson_dict,
+                "hash": self._create_lesson_hash(lesson),
             },
         )
         if (classroom := lesson.classroom) is not None:
@@ -94,3 +102,13 @@ class NeoLessonRepository(LessonRepository):
                 },
             )
         return lesson
+
+    def _create_lesson_hash(self, lesson: Lesson) -> str:
+        subject = lesson.subject.title if lesson.subject is not None else "None"
+        teacher = lesson.teacher.name if lesson.teacher is not None else "None"
+        classroom = lesson.classroom.title if lesson.classroom is not None else "None"
+        date_ = lesson.date_.isoformat()
+        hash_ = hashlib.sha512(
+            (lesson.group.title + subject + teacher + classroom + date_).encode(),
+        )
+        return hash_.hexdigest()

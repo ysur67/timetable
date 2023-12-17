@@ -5,40 +5,30 @@ from typing import final
 from neo4j import AsyncSession
 
 from core.domain.group.repositories import GroupRepository
+from core.impls.neo.mappers.neo_record_to_domain_mapper import NeoRecordToDomainMapper
 from core.models import EducationalLevel, Group
 
 
 @final
 class NeoGroupRepository(GroupRepository):
-    def __init__(self, session: AsyncSession) -> None:
+    def __init__(
+        self,
+        session: AsyncSession,
+        mapper: NeoRecordToDomainMapper,
+    ) -> None:
         self._session = session
+        self._mapper = mapper
 
     async def get_all(self) -> Iterable[Group]:
         stmt = """
-            MATCH (group:Group)-[:BELONGS_TO]-(e:EducationalLevel)
+            MATCH (group:Group)-[:BELONGS_TO]-(educational_level:EducationalLevel)
             RETURN
-                group.id as `id`,
-                group.title as `title`,
-                group.code as `code`,
-                e.id as `educational_level_id`,
-                e.title as `educational_level_title`,
-                e.code as `educational_level_code`;
+                group,
+                educational_level;
         """
         result = await self._session.run(stmt)
-        groups = await result.data()
-        return [
-            Group(
-                id=group["id"],
-                external_id=group["code"],
-                title=group["title"],
-                level=EducationalLevel(
-                    id=group["educational_level_id"],
-                    title=group["educational_level_title"],
-                    code=group["educational_level_code"],
-                ),
-            )
-            for group in groups
-        ]
+        records = await result.data()
+        return [self._mapper.map_group(group) for group in records]
 
     async def create_bulk(
         self,
@@ -75,25 +65,14 @@ class NeoGroupRepository(GroupRepository):
 
     async def get_by_title(self, title: str) -> Group | None:
         stmt = """
-            MATCH (g:Group)-[:BELONGS_TO]-(e:EducationalLevel)
-                where toLower(g.title) = $group
+            MATCH (group:Group)-[:BELONGS_TO]-(educational_level:EducationalLevel)
+                where toLower(group.title) = toLower($group)
             RETURN
-                group.id as `id`,
-                group.title as `title`,
-                group.code as `code`,
-                e.id as `educational_level_id`,
-                e.title as `educational_level_title`,
-                e.code as `educational_level_code`;
+                group,
+                educational_level;
         """
         result = await self._session.run(stmt, parameters={"group": title})
         record = await result.single()
-        return Group(
-            id=record["id"],
-            external_id=record["code"],
-            title=record["title"],
-            level=EducationalLevel(
-                id=record["educational_level_id"],
-                title=record["educational_level_title"],
-                code=record["educational_level_code"],
-            ),
-        )
+        if record is None:
+            return None
+        return self._mapper.map_group(record.data())

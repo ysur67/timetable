@@ -3,13 +3,14 @@ import re
 from collections.abc import Sequence
 from datetime import UTC, date, datetime, time
 from functools import reduce
-from typing import Final, Protocol, final
+from typing import Final, final
 
 import httpx
 from pydantic import BaseModel
 from selectolax.parser import HTMLParser, Node
 
 from core.models.educational_level import EducationalLevel
+from scraping.clients.lessons.lessons_client import LessonsClient
 from scraping.schemas import LessonSchema
 from scraping.schemas.classroom import ClassroomSchema
 from scraping.schemas.group import GroupWithoutCodeSchema
@@ -48,11 +49,6 @@ class InvalidTimeRangeError(Exception):
 class InvalidTimeFormatError(Exception):
     def __init__(self, value: str) -> None:
         super().__init__(f"'{value} has invalid time format'")
-
-
-class LessonsClient(Protocol):
-    async def get_all(self, level: EducationalLevel) -> Sequence[LessonSchema]:
-        ...
 
 
 # TODO: Переписать, своровано с прошлой имплементации
@@ -224,7 +220,7 @@ class HttpLessonsClient(LessonsClient):
 
     def _get_date_from_string(self, value: str) -> date:
         initial = value.split(" ")
-        if not initial or len(initial) < 2:
+        if not initial or len(initial) < 2:  # noqa: PLR2004
             raise InvalidLessonDateError(value)
         date_format = "%d.%m.%Y"
         return datetime.strptime(initial[0], date_format).replace(tzinfo=UTC).date()

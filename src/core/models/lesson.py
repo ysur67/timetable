@@ -15,8 +15,9 @@ class Lesson(Model):
     date_: date
     time_start: time
     time_end: time
-    group: "Group | None"
+    group: "Group"
     teacher: "Teacher | None"
     subject: "Subject | None"
     classroom: "Classroom | None"
     link: str
+    note: str

@@ -6,7 +6,7 @@ from core.domain.educational_level.repositories import EducationalLevelRepositor
 from core.domain.group.repositories import GroupRepository
 from core.models import EducationalLevel, Group, GroupId
 from lib.logger import get_default_logger
-from scraping.clients.groups_client import GroupsClient
+from scraping.clients.groups.groups_client import GroupsClient
 from scraping.schemas.educational_level import EducationalLevelSchema
 from scraping.schemas.group import GroupSchema
 
