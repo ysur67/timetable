@@ -1,7 +1,7 @@
 from typing import Annotated
 
-from aiogram import Bot, Dispatcher
-from aiogram.filters import CommandStart
+from aiogram import Bot, Dispatcher, F
+from aiogram.filters import Command, CommandStart, or_f
 from aiogram.types import Message
 from aiogram.utils.keyboard import ReplyKeyboardBuilder
 from aioinject import Inject, inject
@@ -13,7 +13,7 @@ dispatcher = Dispatcher()
 dispatcher.message.middleware(CurrentUserMiddleware())
 
 
-@dispatcher.message(CommandStart())
+@dispatcher.message(or_f(CommandStart(), F.text == "меню"))
 @inject
 async def handle_command_start(
     message: Message,
@@ -32,4 +32,28 @@ async def handle_command_start(
         message.chat.id,
         "Выберите один из пунктов",
         reply_markup=builder.as_markup(),
+    )
+
+
+@dispatcher.message(
+    or_f(
+        F.text == "Показать расписание",
+        Command("/get_schedule"),
+    ),
+)
+@inject
+async def handle_get_schedule(
+    message: Message,
+    bot: Annotated[Bot, Inject],
+    user: User,
+) -> None:
+    if (group := user.preferences.selected_group) is None:
+        await bot.send_message(
+            message.chat.id,
+            "Группа не выбрана",
+        )
+        return
+    await bot.send_message(
+        message.chat.id,
+        f"Группа {group.title}",
     )
