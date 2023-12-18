@@ -1,4 +1,4 @@
-from collections.abc import Iterable
+from collections.abc import Sequence
 from typing import final
 
 from neo4j import AsyncSession
@@ -18,7 +18,7 @@ class NeoEducationalLevelRepository(EducationalLevelRepository):
         self._session = session
         self._mapper = mapper
 
-    async def get_all(self) -> Iterable[EducationalLevel]:
+    async def get_all(self) -> Sequence[EducationalLevel]:
         stmt = """
             match (educational_level:EducationalLevel)
             return educational_level;

@@ -5,7 +5,11 @@ import aioinject
 
 from core.domain.classroom.repositories import ClassroomRepository
 from core.domain.classroom.services import ClassroomService
+from core.domain.educational_level.queries.get_all import GetAllEducationalLevelsQuery
 from core.domain.educational_level.repositories import EducationalLevelRepository
+from core.domain.group.queries.get_by_educational_level import (
+    GetGroupsByEducationalLevelQuery,
+)
 from core.domain.group.repositories import GroupRepository
 from core.domain.lesson.repository import LessonRepository
 from core.domain.lesson.services import LessonService
@@ -16,8 +20,14 @@ from core.domain.teacher.services import TeacherService
 from core.domain.user.repositories import UserRepository
 from core.impls.neo.domain.classroom.repositories import NeoClassroomRepository
 from core.impls.neo.domain.classroom.services import NeoClassroomService
+from core.impls.neo.domain.educational_level.queries.get_all import (
+    NeoGetAllEducationalLevelsQuery,
+)
 from core.impls.neo.domain.educational_level.repositories import (
     NeoEducationalLevelRepository,
+)
+from core.impls.neo.domain.group.queries.get_by_educational_level import (
+    NeoGetGroupsByEducationalLevelQuery,
 )
 from core.impls.neo.domain.group.repositories import NeoGroupRepository
 from core.impls.neo.domain.lesson.repository import NeoLessonRepository
@@ -42,4 +52,9 @@ providers: Iterable[aioinject.Provider[Any]] = [
     aioinject.Callable(NeoClassroomService, ClassroomService),
     aioinject.Callable(NeoLessonService, LessonService),
     aioinject.Callable(NeoUserRepository, UserRepository),
+    aioinject.Callable(NeoGetAllEducationalLevelsQuery, GetAllEducationalLevelsQuery),
+    aioinject.Callable(
+        NeoGetGroupsByEducationalLevelQuery,
+        GetGroupsByEducationalLevelQuery,
+    ),
 ]

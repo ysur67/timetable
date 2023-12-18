@@ -1,11 +1,18 @@
-from collections.abc import Iterable
+from collections.abc import Iterable, Sequence
 from typing import Protocol
 
 from core.models import Group
+from core.models.educational_level import EducationalLevelId
 
 
 class GroupRepository(Protocol):
     async def get_all(self) -> Iterable[Group]:
+        ...
+
+    async def get_by_educational_level(
+        self,
+        level_id: EducationalLevelId,
+    ) -> Sequence[Group]:
         ...
 
     async def create_bulk(

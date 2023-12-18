@@ -14,6 +14,7 @@ pytest_plugins = [
     "tests.plugins.repositories",
     "tests.plugins.services",
     "tests.plugins.commands",
+    "tests.plugins.queries",
 ]
 
 

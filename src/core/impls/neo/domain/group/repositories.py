@@ -1,5 +1,5 @@
 import collections
-from collections.abc import Iterable
+from collections.abc import Iterable, Sequence
 from typing import final
 
 from neo4j import AsyncSession
@@ -7,6 +7,7 @@ from neo4j import AsyncSession
 from core.domain.group.repositories import GroupRepository
 from core.impls.neo.mappers.neo_record_to_domain_mapper import NeoRecordToDomainMapper
 from core.models import EducationalLevel, Group
+from core.models.educational_level import EducationalLevelId
 
 
 @final
@@ -76,3 +77,23 @@ class NeoGroupRepository(GroupRepository):
         if record is None:
             return None
         return self._mapper.map_group(record.data())
+
+    async def get_by_educational_level(
+        self,
+        level_id: EducationalLevelId,
+    ) -> Sequence[Group]:
+        stmt = """
+            MATCH (group:Group)-[:BELONGS_TO]-(educational_level:EducationalLevel)
+                WHERE educational_level.id = $level_id
+            RETURN
+                group,
+                educational_level;
+        """
+        result = await self._session.run(
+            stmt,
+            parameters={
+                "level_id": str(level_id),
+            },
+        )
+        records = await result.data()
+        return [self._mapper.map_group(group) for group in records]
