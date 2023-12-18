@@ -19,6 +19,14 @@
             "program": "${workspaceFolder}/src/scraping/main.py",
             "console": "integratedTerminal",
             "justMyCode": true
+        },
+        {
+            "name": "Telegram bot",
+            "type": "python",
+            "request": "launch",
+            "program": "${workspaceFolder}/src/adapters/telegram/main.py",
+            "console": "integratedTerminal",
+            "justMyCode": true
         }
     ]
 }

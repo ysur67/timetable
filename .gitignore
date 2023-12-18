@@ -164,3 +164,7 @@ cython_debug/
 
 /data
 /queries
+
+docker-compose.*.yaml
+!docker-compose.example.yaml
+docker-compose.yaml

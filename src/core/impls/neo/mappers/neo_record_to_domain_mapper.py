@@ -1,13 +1,29 @@
 from typing import Any
 
-from core.models import EducationalLevel, Group
-from core.models.classroom import Classroom
-from core.models.lesson import Lesson
-from core.models.subject import Subject
-from core.models.teacher import Teacher
+from core.models import (
+    Classroom,
+    EducationalLevel,
+    Group,
+    Lesson,
+    Subject,
+    Teacher,
+    User,
+)
+from core.models.user import UserPreferences
 
 
 class NeoRecordToDomainMapper:
+    def map_user(self, record: dict[str, Any]) -> User:
+        data: dict[str, Any] = record["user"]
+        preferences = UserPreferences.empty()
+        if record.get("group", None) is not None:
+            preferences = UserPreferences(selected_group=self.map_group(record))
+        return User(
+            id=data["id"],
+            telegram_id=data["telegram_id"],
+            preferences=preferences,
+        )
+
     def map_group(self, record: dict[str, Any]) -> Group:
         data: dict[str, Any] = record["group"]
         return Group(

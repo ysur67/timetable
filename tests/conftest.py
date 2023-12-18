@@ -13,6 +13,7 @@ pytest_plugins = [
     "tests.plugins.shared_objects",
     "tests.plugins.repositories",
     "tests.plugins.services",
+    "tests.plugins.commands",
 ]
 
 

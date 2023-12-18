@@ -5,7 +5,35 @@
 groups = ["default", "dev"]
 strategy = ["cross_platform"]
 lock_version = "4.4"
-content_hash = "sha256:79f22826187a33b093f435021eca9c330abff6c71da6125c88c83a86316841f0"
+content_hash = "sha256:14a1e287ce11188507073452b87d476a886abad9d1501af0f925c05c84d6c8b7"
+
+[[package]]
+name = "aiofiles"
+version = "23.2.1"
+requires_python = ">=3.7"
+summary = "File support for asyncio."
+files = [
+    {file = "aiofiles-23.2.1-py3-none-any.whl", hash = "sha256:19297512c647d4b27a2cf7c34caa7e405c0d60b5560618a29a9fe027b18b0107"},
+    {file = "aiofiles-23.2.1.tar.gz", hash = "sha256:84ec2218d8419404abcb9f0c02df3f34c6e0a68ed41072acfb1cef5cbc29051a"},
+]
+
+[[package]]
+name = "aiogram"
+version = "3.2.0"
+requires_python = ">=3.8"
+summary = "Modern and fully asynchronous framework for Telegram Bot API"
+dependencies = [
+    "aiofiles~=23.2.1",
+    "aiohttp~=3.9.0",
+    "certifi>=2023.7.22",
+    "magic-filter<1.1,>=1.0.12",
+    "pydantic<2.6,>=2.4.1",
+    "typing-extensions<=5.0,>=4.7.0",
+]
+files = [
+    {file = "aiogram-3.2.0-py3-none-any.whl", hash = "sha256:c6c8b649979072d6f1ad7e90e15c5ad1f373d12998333d2329fbeb723c820ddd"},
+    {file = "aiogram-3.2.0.tar.gz", hash = "sha256:34cc2bf1c54bf29f74b01dc460600baf9b28a88c9143838f2916e5d4f8421f75"},
+]
 
 [[package]]
 name = "aiohttp"
@@ -353,6 +381,29 @@ summary = "A Python utility / library to sort Python imports."
 files = [
     {file = "isort-5.13.2-py3-none-any.whl", hash = "sha256:8ca5e72a8d85860d5a3fa69b8745237f2939afe12dbf656afbcb47fe72d947a6"},
     {file = "isort-5.13.2.tar.gz", hash = "sha256:48fdfcb9face5d58a4f6dde2e72a1fb8dcaf8ab26f95ab49fab84c2ddefb0109"},
+]
+
+[[package]]
+name = "jinja2"
+version = "3.1.2"
+requires_python = ">=3.7"
+summary = "A very fast and expressive template engine."
+dependencies = [
+    "MarkupSafe>=2.0",
+]
+files = [
+    {file = "Jinja2-3.1.2-py3-none-any.whl", hash = "sha256:6088930bfe239f0e6710546ab9c19c9ef35e29792895fed6e6e31a023a182a61"},
+    {file = "Jinja2-3.1.2.tar.gz", hash = "sha256:31351a702a408a9e7595a8fc6150fc3f43bb6bf7e319770cbc0db9df9437e852"},
+]
+
+[[package]]
+name = "magic-filter"
+version = "1.0.12"
+requires_python = ">=3.7"
+summary = ""
+files = [
+    {file = "magic_filter-1.0.12-py3-none-any.whl", hash = "sha256:e5929e544f310c2b1f154318db8c5cdf544dd658efa998172acd2e4ba0f6c6a6"},
+    {file = "magic_filter-1.0.12.tar.gz", hash = "sha256:4751d0b579a5045d1dc250625c4c508c18c3def5ea6afaf3957cb4530d03f7f9"},
 ]
 
 [[package]]

@@ -5,9 +5,11 @@ from .group import Group, GroupExternalId, GroupId
 from .lesson import Lesson, LessonId
 from .subject import Subject, SubjectId
 from .teacher import Teacher, TeacherId
+from .user import User, UserId, UserPreferences, UserTelegramId
 
 Group.model_rebuild()
 Lesson.model_rebuild()
+UserPreferences.model_rebuild()
 
 __all__ = [
     "Model",
@@ -24,4 +26,7 @@ __all__ = [
     "ClassroomId",
     "Subject",
     "SubjectId",
+    "User",
+    "UserId",
+    "UserTelegramId",
 ]

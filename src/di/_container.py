@@ -7,14 +7,19 @@ import aioinject
 from pydantic_settings import BaseSettings
 
 import scraping
+from adapters.telegram.dependencies import create_bot
+from core.domain import user
 from core.impls import neo
 from core.impls.neo.dependencies import get_driver, get_session
 from lib.settings import NeoSettings, get_settings
+from lib.settings.telegram import TelegramSettings
 
-SETTINGS = (NeoSettings,)
+SETTINGS = (NeoSettings, TelegramSettings)
+
 MODULES: Iterable[Iterable[aioinject.Provider[Any]]] = [
     neo.providers,
     scraping.providers,
+    user.providers,
 ]
 
 
@@ -33,6 +38,7 @@ def create_container() -> aioinject.Container:
     container = aioinject.Container()
     container.register(aioinject.Singleton(get_driver))
     container.register(aioinject.Callable(get_session))
+    container.register(aioinject.Singleton(create_bot))
 
     _register_settings(container, settings_classes=SETTINGS)
 

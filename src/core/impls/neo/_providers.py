@@ -13,6 +13,7 @@ from core.domain.subject.repositories import SubjectRepository
 from core.domain.subject.services import SubjectService
 from core.domain.teacher.repositories import TeacherRepository
 from core.domain.teacher.services import TeacherService
+from core.domain.user.repositories import UserRepository
 from core.impls.neo.domain.classroom.repositories import NeoClassroomRepository
 from core.impls.neo.domain.classroom.services import NeoClassroomService
 from core.impls.neo.domain.educational_level.repositories import (
@@ -25,12 +26,13 @@ from core.impls.neo.domain.subject.repositories import NeoSubjectRepository
 from core.impls.neo.domain.subject.services import NeoSubjectService
 from core.impls.neo.domain.teacher.repositories import NeoTeacherRepository
 from core.impls.neo.domain.teacher.services import NeoTeacherService
+from core.impls.neo.domain.user.repositories import NeoUserRepository
 from core.impls.neo.mappers.neo_record_to_domain_mapper import NeoRecordToDomainMapper
 
 providers: Iterable[aioinject.Provider[Any]] = [
     aioinject.Callable(NeoRecordToDomainMapper),
-    aioinject.Callable(NeoEducationalLevelRepository, type_=EducationalLevelRepository),
-    aioinject.Callable(NeoGroupRepository, type_=GroupRepository),
+    aioinject.Callable(NeoEducationalLevelRepository, EducationalLevelRepository),
+    aioinject.Callable(NeoGroupRepository, GroupRepository),
     aioinject.Callable(NeoTeacherRepository, TeacherRepository),
     aioinject.Callable(NeoSubjectRepository, SubjectRepository),
     aioinject.Callable(NeoClassroomRepository, ClassroomRepository),
@@ -39,4 +41,5 @@ providers: Iterable[aioinject.Provider[Any]] = [
     aioinject.Callable(NeoSubjectService, SubjectService),
     aioinject.Callable(NeoClassroomService, ClassroomService),
     aioinject.Callable(NeoLessonService, LessonService),
+    aioinject.Callable(NeoUserRepository, UserRepository),
 ]
