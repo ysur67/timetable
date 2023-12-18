@@ -1,5 +1,5 @@
 import uuid
-from typing import Annotated
+from typing import Annotated, assert_never
 
 from aiogram import Bot, Dispatcher, F
 from aiogram.filters import Command, CommandStart, or_f
@@ -8,18 +8,25 @@ from aiogram.types import CallbackQuery, Message
 from aiogram.utils.keyboard import InlineKeyboardBuilder, ReplyKeyboardBuilder
 from aioinject import Inject, inject
 
-from adapters.telegram.middlewares.current_user import CurrentUserMiddleware
+from adapters.telegram.middlewares.current_user import (
+    CallbackCurrentUserMiddleware,
+    ChatCurrentUserMiddleware,
+)
 from adapters.telegram.states import GroupSelectionState
 from core.domain.educational_level.queries.get_all import GetAllEducationalLevelsQuery
 from core.domain.group.dtos import GetGroupsByEducationalLevelDto
 from core.domain.group.queries.get_by_educational_level import (
     GetGroupsByEducationalLevelQuery,
 )
-from core.errors import Never
+from core.domain.user.commands.set_selected_group import SetSelectedGroupCommand
+from core.domain.user.dtos import SetSelectedGroupDto
+from core.errors import EntityNotFoundError, Never
+from core.models.group import GroupId
 from core.models.user import User
 
 dispatcher = Dispatcher()
-dispatcher.message.middleware(CurrentUserMiddleware())
+dispatcher.message.middleware(ChatCurrentUserMiddleware())
+dispatcher.callback_query.middleware(CallbackCurrentUserMiddleware())
 
 
 @dispatcher.message(or_f(CommandStart(), F.text == "меню"))
@@ -119,11 +126,41 @@ async def handle_educational_level_selection(
         )
         return
     await state.set_state(GroupSelectionState.group_selection)
-    builder = ReplyKeyboardBuilder()
+    builder = InlineKeyboardBuilder()
     for group in groups:
-        builder.button(text=group.title)
+        builder.button(text=group.title, callback_data=str(group.id))
     builder.adjust(2)
-    await callback.answer(
+    if callback.message is None:
+        raise Never
+    await callback.message.answer(
         "Выберите одну из групп",
         reply_markup=builder.as_markup(),
     )
+
+
+@dispatcher.callback_query(GroupSelectionState.group_selection)
+@inject
+async def handle_group_selection(
+    callback: CallbackQuery,
+    state: FSMContext,
+    command: Annotated[SetSelectedGroupCommand, Inject],
+    user: User,
+) -> None:
+    result = await command.execute(
+        SetSelectedGroupDto(
+            group_id=GroupId(uuid.UUID(callback.data)),
+            user=user,
+        ),
+    )
+    if (err := result.err()) is not None:
+        match err:
+            case EntityNotFoundError():
+                await callback.answer(
+                    "Не удалось найти выбранную группу...",
+                    show_alert=True,
+                )
+            case _ as never:
+                assert_never(never)
+    group = result.unwrap()
+    await state.clear()
+    await callback.answer(f"Группа {group.title} успешно выбрана")

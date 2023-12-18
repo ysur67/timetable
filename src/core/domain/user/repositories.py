@@ -9,3 +9,6 @@ class UserRepository(Protocol):
 
     async def create(self, user: User) -> User:
         ...
+
+    async def save(self, user: User) -> User:
+        ...

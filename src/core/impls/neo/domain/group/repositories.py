@@ -8,6 +8,7 @@ from core.domain.group.repositories import GroupRepository
 from core.impls.neo.mappers.neo_record_to_domain_mapper import NeoRecordToDomainMapper
 from core.models import EducationalLevel, Group
 from core.models.educational_level import EducationalLevelId
+from core.models.group import GroupId
 
 
 @final
@@ -97,3 +98,17 @@ class NeoGroupRepository(GroupRepository):
         )
         records = await result.data()
         return [self._mapper.map_group(group) for group in records]
+
+    async def get_by_id(self, ident: GroupId) -> Group | None:
+        stmt = """
+            MATCH (group:Group)-[:BELONGS_TO]-(educational_level:EducationalLevel)
+                where group.id = $id
+            RETURN
+                group,
+                educational_level;
+        """
+        result = await self._session.run(stmt, parameters={"id": str(ident)})
+        record = await result.single()
+        if record is None:
+            return None
+        return self._mapper.map_group(record.data())

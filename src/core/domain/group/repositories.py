@@ -3,6 +3,7 @@ from typing import Protocol
 
 from core.models import Group
 from core.models.educational_level import EducationalLevelId
+from core.models.group import GroupId
 
 
 class GroupRepository(Protocol):
@@ -22,4 +23,7 @@ class GroupRepository(Protocol):
         ...
 
     async def get_by_title(self, title: str) -> Group | None:
+        ...
+
+    async def get_by_id(self, ident: GroupId) -> Group | None:
         ...
