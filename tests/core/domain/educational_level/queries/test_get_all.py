@@ -15,7 +15,7 @@ async def test_returns_actual_data_if_there_are_existing_educational_levels(
     assert result[0].id == educational_level.id
 
 
-async def test_returns_nothing_if_there_is_no_educational_levels(
+async def test_returns_nothing_if_there_are_no_educational_levels(
     get_all_educational_levels_query: GetAllEducationalLevelsQuery,
 ) -> None:
     result = await get_all_educational_levels_query.execute()
