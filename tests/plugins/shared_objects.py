@@ -2,10 +2,13 @@ import pytest
 from neo4j import AsyncSession
 
 from core.models import EducationalLevel, Group
+from core.models.lesson import Lesson
 from core.models.user import User
 from tests.factories.educational_level_factory import EducationalLevelFactory
 from tests.factories.group_factory import GroupFactory
+from tests.factories.lesson_factory import LessonFactory
 from tests.factories.user_factory import UserFactory
+from tests.utils.models.lessons.create_lesson import create_lesson
 
 
 @pytest.fixture()
@@ -47,3 +50,8 @@ async def user(session: AsyncSession) -> User:
         parameters={"user": user.model_dump(mode="json")},
     )
     return user
+
+
+@pytest.fixture()
+async def lesson(session: AsyncSession, group: Group) -> Lesson:
+    return await create_lesson(session, LessonFactory.build(group=group))

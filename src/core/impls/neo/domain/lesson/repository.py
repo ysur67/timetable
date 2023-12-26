@@ -1,11 +1,12 @@
 import hashlib
+from collections.abc import Sequence
 from typing import final
 
 from neo4j import AsyncSession
 
-from core.domain.lesson.repository import LessonRepository
+from core.domain.lesson.repository import LessonRepository, LessonsFilter
 from core.impls.neo.mappers.neo_record_to_domain_mapper import NeoRecordToDomainMapper
-from core.models.lesson import Lesson
+from core.models import Lesson
 
 
 @final
@@ -102,6 +103,44 @@ class NeoLessonRepository(LessonRepository):
                 },
             )
         return lesson
+
+    async def get_lessons(self, filter_: LessonsFilter) -> Sequence[Lesson]:
+        stmt = self._get_lessons_stmt(filter_)
+        result = await self._session.run(
+            stmt,
+            parameters={
+                "filter": filter_.model_dump(mode="json"),
+            },
+        )
+        records = await result.data()
+        return [self._mapper.map_lesson(lesson) for lesson in records]
+
+    def _get_lessons_stmt(self, filter_: LessonsFilter) -> str:
+        stmt = """
+            match (lesson:Lesson)-[:TAUGHT_TO]-(group:Group)-[:BELONGS_TO]-(educational_level:EducationalLevel)
+                {where_clause}
+            optional match (lesson:Lesson)-[:TOPIC_OF]-(subject:Subject),
+                (lesson:Lesson)-[:TAUGHT_BY]-(teacher:Teacher),
+                (lesson:Lesson)-[:HELD_IN]-(classroom:Classroom)
+        """
+        return_stmt = (
+            "return lesson, group, subject, teacher, classroom, educational_level;"
+        )
+        if filter_.has_any_value is False:
+            stmt = stmt.format(where_clause="")
+            return f"{stmt}\n{return_stmt}"
+        filter_clauses: list[str] = []
+        if filter_.start_date is not None:
+            filter_clauses.append(
+                "datetime(lesson.date) > datetime($filter.start_date)",
+            )
+        if filter_.end_date is not None:
+            filter_clauses.append("datetime(lesson.date) < datetime($filter.end_date)")
+        if filter_.group is not None:
+            filter_clauses.append("group.id = $filter.group.id")
+        clause = "where " + " and ".join(filter_clauses)
+        stmt = stmt.format(where_clause=clause)
+        return f"{stmt}\n{return_stmt}"
 
     def _create_lesson_hash(self, lesson: Lesson) -> str:
         subject = lesson.subject.title if lesson.subject is not None else "None"

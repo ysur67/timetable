@@ -11,6 +11,7 @@ from core.domain.group.queries.get_by_educational_level import (
     GetGroupsByEducationalLevelQuery,
 )
 from core.domain.group.repositories import GroupRepository
+from core.domain.lesson.query.lessons_report import LessonsReportQuery
 from core.domain.lesson.repository import LessonRepository
 from core.domain.lesson.services import LessonService
 from core.domain.subject.repositories import SubjectRepository
@@ -30,6 +31,7 @@ from core.impls.neo.domain.group.queries.get_by_educational_level import (
     NeoGetGroupsByEducationalLevelQuery,
 )
 from core.impls.neo.domain.group.repositories import NeoGroupRepository
+from core.impls.neo.domain.lesson.queries.lessons_report import NeoLessonsReportQuery
 from core.impls.neo.domain.lesson.repository import NeoLessonRepository
 from core.impls.neo.domain.lesson.services import NeoLessonService
 from core.impls.neo.domain.subject.repositories import NeoSubjectRepository
@@ -57,4 +59,5 @@ providers: Iterable[aioinject.Provider[Any]] = [
         NeoGetGroupsByEducationalLevelQuery,
         GetGroupsByEducationalLevelQuery,
     ),
+    aioinject.Callable(NeoLessonsReportQuery, LessonsReportQuery),
 ]
