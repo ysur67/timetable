@@ -1,0 +1,10 @@
+Расписание с {{ report.date_start }} по {{ report.date_end }}
+{% for lesson in report.lessons %}
+Дата: {{ lesson.date_ }}
+Начало: {{ lesson.time_start }}
+Конец: {{ lesson.time_end }}
+{% if lesson.subject %}Предмет: {{ lesson.subject.title }}{% endif %}
+{% if lesson.teacher %}Преподаватель: {{ lesson.teacher.name }}{% endif %}
+{% if lesson.href %}Ссылка: lesson.href{% endif %}
+{% if lesson.note %}Примечание: {{ lesson.note }}{% endif %}
+{% endfor %}

@@ -13,6 +13,7 @@ UserId = NewType("UserId", uuid.UUID)
 
 class UserPreferences(Model):
     selected_group: "Group | None" = None
+    report_days_offset: int = 14
 
     @classmethod
     def empty(cls) -> "UserPreferences":

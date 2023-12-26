@@ -123,9 +123,10 @@ class NeoLessonRepository(LessonRepository):
                 (lesson:Lesson)-[:TAUGHT_BY]-(teacher:Teacher),
                 (lesson:Lesson)-[:HELD_IN]-(classroom:Classroom)
         """
-        return_stmt = (
-            "return lesson, group, subject, teacher, classroom, educational_level;"
-        )
+        return_stmt = """
+            return lesson, group, subject, teacher, classroom, educational_level
+            order by DateTime(lesson.date) ASC;
+        """
         if filter_.has_any_value is False:
             stmt = stmt.format(where_clause="")
             return f"{stmt}\n{return_stmt}"

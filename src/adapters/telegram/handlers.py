@@ -1,4 +1,5 @@
 import uuid
+from datetime import timedelta
 from typing import Annotated, assert_never
 
 from aiogram import Bot, Dispatcher, F
@@ -18,11 +19,15 @@ from core.domain.group.dtos import GetGroupsByEducationalLevelDto
 from core.domain.group.queries.get_by_educational_level import (
     GetGroupsByEducationalLevelQuery,
 )
+from core.domain.lesson.dtos import GetLessonsReportDto
+from core.domain.lesson.query.lessons_report import LessonsReportQuery
 from core.domain.user.commands.set_selected_group import SetSelectedGroupCommand
 from core.domain.user.dtos import SetSelectedGroupDto
 from core.errors import EntityNotFoundError, Never
+from core.internal.report_renderer import ReportRenderer
 from core.models.group import GroupId
 from core.models.user import User
+from lib.dates import utc_now
 
 dispatcher = Dispatcher()
 dispatcher.message.middleware(ChatCurrentUserMiddleware())
@@ -61,18 +66,26 @@ async def handle_command_start(
 async def handle_get_schedule(
     message: Message,
     bot: Annotated[Bot, Inject],
+    query: Annotated[LessonsReportQuery, Inject],
+    renderer: Annotated[ReportRenderer, Inject],
     user: User,
 ) -> None:
-    if (group := user.preferences.selected_group) is None:
+    if user.preferences.selected_group is None:
         await bot.send_message(
             message.chat.id,
             "Группа не выбрана",
         )
         return
-    await bot.send_message(
-        message.chat.id,
-        f"Группа {group.title}",
+    current_date = utc_now().date()
+    report = await query.execute(
+        GetLessonsReportDto(
+            group=user.preferences.selected_group,
+            start_date=current_date,
+            end_date=current_date + timedelta(days=user.preferences.report_days_offset),
+        ),
     )
+    result = await renderer.render(report)
+    await bot.send_message(message.chat.id, result)
 
 
 @dispatcher.message(
