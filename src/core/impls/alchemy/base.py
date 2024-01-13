@@ -21,6 +21,7 @@ uuid_pk = Annotated[
     uuid.UUID,
     mapped_column(primary_key=True, default=uuid.uuid4),
 ]
+uuid_str_pk = Annotated[str, mapped_column(String(length=32), primary_key=True)]
 int32_pk = Annotated[
     int,
     mapped_column(
@@ -51,6 +52,7 @@ str_255 = Annotated[str, 255]
 str_500 = Annotated[str, 500]
 
 int64 = Annotated[int, mapped_column(BigInteger)]
+uuid_str = Annotated[str, mapped_column(String(32))]
 
 
 class Base(DeclarativeBase):

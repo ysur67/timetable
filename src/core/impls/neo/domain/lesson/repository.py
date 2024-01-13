@@ -1,4 +1,3 @@
-import hashlib
 from collections.abc import Sequence
 from typing import final
 
@@ -32,7 +31,7 @@ class NeoLessonRepository(LessonRepository):
         """
         result = await self._session.run(
             stmt,
-            parameters={"hash": self._create_lesson_hash(lesson)},
+            parameters={"hash": lesson.get_hash()},
         )
         record = await result.single()
         if record is None:
@@ -60,7 +59,7 @@ class NeoLessonRepository(LessonRepository):
             parameters={
                 "group": lesson.group.model_dump(mode="json"),
                 "lesson": lesson_dict,
-                "hash": self._create_lesson_hash(lesson),
+                "hash": lesson.get_hash(),
             },
         )
         if (classroom := lesson.classroom) is not None:
@@ -142,13 +141,3 @@ class NeoLessonRepository(LessonRepository):
         clause = "where " + " and ".join(filter_clauses)
         stmt = stmt.format(where_clause=clause)
         return f"{stmt}\n{return_stmt}"
-
-    def _create_lesson_hash(self, lesson: Lesson) -> str:
-        subject = lesson.subject.title if lesson.subject is not None else "None"
-        teacher = lesson.teacher.name if lesson.teacher is not None else "None"
-        classroom = lesson.classroom.title if lesson.classroom is not None else "None"
-        date_ = lesson.date_.isoformat()
-        hash_ = hashlib.sha512(
-            (lesson.group.title + subject + teacher + classroom + date_).encode(),
-        )
-        return hash_.hexdigest()

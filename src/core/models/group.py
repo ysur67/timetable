@@ -10,6 +10,12 @@ GroupId = NewType("GroupId", uuid.UUID)
 GroupExternalId = NewType("GroupExternalId", str)
 
 
+class SimpleGroup(Model):
+    id: GroupId
+    external_id: GroupExternalId
+    title: str
+
+
 class Group(Model):
     id: GroupId
     external_id: GroupExternalId
