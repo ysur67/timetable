@@ -11,11 +11,13 @@ from adapters.telegram.dependencies import create_bot
 from core import internal
 from core.domain import user
 from core.impls import neo
-from core.impls.neo.dependencies import get_driver, get_session
+from core.impls.alchemy.deps import get_alchemy_session, get_engine
+from core.impls.neo.dependencies import get_driver
 from lib.settings import NeoSettings, get_settings
+from lib.settings.database import SqliteSettings
 from lib.settings.telegram import TelegramSettings
 
-SETTINGS = (NeoSettings, TelegramSettings)
+SETTINGS = (NeoSettings, TelegramSettings, SqliteSettings)
 
 MODULES: Iterable[Iterable[aioinject.Provider[Any]]] = [
     neo.providers,
@@ -38,8 +40,8 @@ def _register_settings(
 @functools.lru_cache
 def create_container() -> aioinject.Container:
     container = aioinject.Container()
-    container.register(aioinject.Singleton(get_driver))
-    container.register(aioinject.Callable(get_session))
+    _init_neo4j(container)
+    _init_sqlalchemy(container)
     container.register(aioinject.Singleton(create_bot))
 
     _register_settings(container, settings_classes=SETTINGS)
@@ -48,3 +50,13 @@ def create_container() -> aioinject.Container:
         container.register(provider)
 
     return container
+
+
+def _init_neo4j(container: aioinject.Container) -> None:
+    container.register(aioinject.Singleton(get_driver))
+    container.register(aioinject.Callable(get_alchemy_session))
+
+
+def _init_sqlalchemy(container: aioinject.Container) -> None:
+    container.register(aioinject.Singleton(get_engine))
+    container.register(aioinject.Callable(get_alchemy_session))
