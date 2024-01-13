@@ -6,8 +6,7 @@ from sqlalchemy.orm import Mapped, mapped_column, relationship
 from core.impls.alchemy.base import Base, int64, int64_pk
 
 if TYPE_CHECKING:
-    from core.impls.alchemy.tables.educational_level import EducationalLevel
-    from core.impls.alchemy.tables.user import User
+    from core.impls.alchemy.tables import EducationalLevel, Lesson, User
 
 
 class Group(Base):
@@ -19,3 +18,4 @@ class Group(Base):
 
     level: Mapped["EducationalLevel"] = relationship(back_populates="groups")
     users: Mapped[list["User"]] = relationship(back_populates="selected_group")
+    lessons: Mapped[list["Lesson"]] = relationship(back_populates="group")

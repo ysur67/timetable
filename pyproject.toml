@@ -48,7 +48,7 @@ filterwarnings = [
 
 [tool.coverage.run]
 source = ["src"]
-omit = ["tests/"]
+omit = ["tests/", "src/alembic/*"]
 command_line = "-m pytest -vv"
 concurrency = ["greenlet", "thread"]
 
