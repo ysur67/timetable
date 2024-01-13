@@ -12,7 +12,6 @@ pytest_plugins = [
     "anyio",
     "tests.plugins.shared_objects",
     "tests.plugins.repositories",
-    "tests.plugins.services",
     "tests.plugins.commands",
     "tests.plugins.queries",
 ]

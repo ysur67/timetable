@@ -1,5 +1,4 @@
 from collections.abc import Sequence
-from typing import final
 
 from neo4j import AsyncSession
 
@@ -8,7 +7,6 @@ from core.impls.neo.mappers.neo_record_to_domain_mapper import NeoRecordToDomain
 from core.models import Lesson
 
 
-@final
 class NeoLessonRepository(LessonRepository):
     def __init__(self, session: AsyncSession, mapper: NeoRecordToDomainMapper) -> None:
         self._session = session

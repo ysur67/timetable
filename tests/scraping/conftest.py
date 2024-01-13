@@ -2,12 +2,12 @@ import pytest
 from faker import Faker
 from neo4j import AsyncSession
 
-from core.domain.classroom.services import ClassroomService
+from core.domain.classroom.repositories import ClassroomRepository
 from core.domain.educational_level.repositories import EducationalLevelRepository
 from core.domain.group.repositories import GroupRepository
-from core.domain.lesson.services import LessonService
-from core.domain.subject.services import SubjectService
-from core.domain.teacher.services import TeacherService
+from core.domain.lesson.repository import LessonRepository
+from core.domain.subject.repositories import SubjectRepository
+from core.domain.teacher.repositories import TeacherRepository
 from core.impls.neo.mappers.neo_record_to_domain_mapper import NeoRecordToDomainMapper
 from scraping.scrapers.groups_scraper import GroupsScraper
 from scraping.scrapers.lessons_scraper import LessonsScraper
@@ -58,17 +58,17 @@ def lessons_scraper(  # noqa: PLR0913
     lessons_client: DummyLessonsClient,
     educational_level_repository: EducationalLevelRepository,
     group_repository: GroupRepository,
-    teacher_service: TeacherService,
-    subject_service: SubjectService,
-    classroom_service: ClassroomService,
-    lesson_service: LessonService,
+    teacher_repository: TeacherRepository,
+    subject_repository: SubjectRepository,
+    classroom_repository: ClassroomRepository,
+    lesson_repository: LessonRepository,
 ) -> LessonsScraper:
     return LessonsScraper(
         lessons_client,
         educational_level_repository,
         group_repository,
-        teacher_service,
-        subject_service,
-        classroom_service,
-        lesson_service,
+        teacher_repository,
+        subject_repository,
+        classroom_repository,
+        lesson_repository,
     )

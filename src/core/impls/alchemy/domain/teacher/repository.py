@@ -36,3 +36,9 @@ class AlchemyTeacherRepository(TeacherRepository):
         self._session.add(model)
         await self._session.flush()
         return teacher
+
+    async def get_or_create(self, teacher: models.Teacher) -> models.Teacher:
+        model = await self.get_by_name(teacher.name)
+        if model is not None:
+            return model
+        return await self.create(teacher)

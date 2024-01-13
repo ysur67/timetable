@@ -67,3 +67,9 @@ class AlchemyLessonRepository(LessonRepository):
         if filter_.group is not None:
             stmt = stmt.where(Lesson.group_id == filter_.group.id)
         return stmt
+
+    async def get_or_create(self, lesson: models.Lesson) -> models.Lesson:
+        model = await self.get(lesson)
+        if model is not None:
+            return model
+        return await self.create(lesson)

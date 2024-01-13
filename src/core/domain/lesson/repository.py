@@ -34,3 +34,6 @@ class LessonRepository(Protocol):
 
     async def get_lessons(self, filter_: LessonsFilter) -> Sequence[Lesson]:
         ...
+
+    async def get_or_create(self, lesson: Lesson) -> Lesson:
+        ...

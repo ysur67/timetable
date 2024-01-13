@@ -9,3 +9,6 @@ class ClassroomRepository(Protocol):
 
     async def create(self, classroom: Classroom) -> Classroom:
         ...
+
+    async def get_or_create(self, classroom: Classroom) -> Classroom:
+        ...

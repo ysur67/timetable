@@ -36,3 +36,9 @@ class AlchemySubjectRepository(SubjectRepository):
         self._session.add(model)
         await self._session.flush()
         return subject
+
+    async def get_or_create(self, subject: models.Subject) -> models.Subject:
+        model = await self.get_by_title(subject.title)
+        if model is not None:
+            return model
+        return await self.create(subject)
