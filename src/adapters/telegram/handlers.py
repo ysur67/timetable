@@ -21,10 +21,10 @@ from core.domain.group.queries.get_by_educational_level import (
 )
 from core.domain.lesson.dtos import GetLessonsReportDto
 from core.domain.lesson.query.lessons_report import LessonsReportQuery
+from core.domain.lesson.report_renderer import ReportRenderer
 from core.domain.user.commands.set_selected_group import SetSelectedGroupCommand
 from core.domain.user.dtos import SetSelectedGroupDto
 from core.errors import EntityNotFoundError, Never
-from core.internal.report_renderer import ReportRenderer
 from core.models.group import GroupId
 from core.models.user import User
 from lib.dates import utc_now

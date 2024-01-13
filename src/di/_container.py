@@ -8,8 +8,7 @@ from pydantic_settings import BaseSettings
 
 import scraping
 from adapters.telegram.dependencies import create_bot
-from core import internal
-from core.domain import user
+from core.domain import lesson, user
 from core.impls import neo
 from core.impls.alchemy.deps import get_alchemy_session, get_engine
 from core.impls.neo.dependencies import get_driver
@@ -22,8 +21,8 @@ SETTINGS = (NeoSettings, TelegramSettings, SqliteSettings)
 MODULES: Iterable[Iterable[aioinject.Provider[Any]]] = [
     neo.providers,
     scraping.providers,
+    lesson.providers,
     user.providers,
-    internal.providers,
 ]
 
 
