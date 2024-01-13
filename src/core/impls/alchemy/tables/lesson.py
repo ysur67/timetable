@@ -29,6 +29,6 @@ class Lesson(Base):
     hash_: Mapped[str]
 
     group: Mapped["Group"] = relationship(back_populates="lessons")
-    teacher: Mapped["Teacher | None"] = relationship(back_populates="teacher")
-    subject: Mapped["Subject | None"] = relationship(back_populates="subject.id")
-    classroom: Mapped["Classroom | None"] = relationship(back_populates="classroom.id")
+    teacher: Mapped["Teacher | None"] = relationship(back_populates="lessons")
+    subject: Mapped["Subject | None"] = relationship(back_populates="lessons")
+    classroom: Mapped["Classroom | None"] = relationship(back_populates="lessons")

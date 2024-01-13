@@ -22,6 +22,16 @@ from core.impls.alchemy.mappers.domain_to_alchemy_mapper import DomainToAlchemyM
 
 
 @pytest.fixture()
+def alchemy_to_domain_mapper() -> AlchemyToDomainMapper:
+    return AlchemyToDomainMapper()
+
+
+@pytest.fixture()
+def domain_to_alchemy_mapper() -> DomainToAlchemyMapper:
+    return DomainToAlchemyMapper()
+
+
+@pytest.fixture()
 def group_repository(
     session: AsyncSession,
     alchemy_to_domain_mapper: AlchemyToDomainMapper,

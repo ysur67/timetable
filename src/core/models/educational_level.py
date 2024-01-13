@@ -1,8 +1,9 @@
+import uuid
 from typing import NewType
 
 from core.models import Model
 
-EducationalLevelId = NewType("EducationalLevelId", int)
+EducationalLevelId = NewType("EducationalLevelId", uuid.UUID)
 
 
 class EducationalLevel(Model):

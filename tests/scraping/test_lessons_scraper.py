@@ -1,6 +1,8 @@
 import pytest
-from neo4j import AsyncSession
+from sqlalchemy import func, select
+from sqlalchemy.ext.asyncio import AsyncSession
 
+from core.impls.alchemy import tables
 from scraping.scrapers.lessons_scraper import LessonsScraper
 from tests.scraping.dummies.lessons_client import DummyLessonsClient
 
@@ -20,11 +22,7 @@ async def test_scraper_will_create_new_lessons(
 
 
 async def _get_lessons_count(session: AsyncSession) -> int:
-    stmt = """
-        MATCH (:Lesson)
-        RETURN count(*) as count;
-    """
-    result = await session.run(stmt)
-    data = await result.single()
-    assert data is not None
-    return int(data["count"])
+    stmt = select(func.count()).select_from(tables.Lesson)
+    result = (await session.execute(stmt)).one_or_none()
+    assert result is not None
+    return int(result[0])

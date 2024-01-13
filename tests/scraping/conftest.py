@@ -1,6 +1,6 @@
 import pytest
 from faker import Faker
-from neo4j import AsyncSession
+from sqlalchemy.ext.asyncio import AsyncSession
 
 from core.domain.classroom.repositories import ClassroomRepository
 from core.domain.educational_level.repositories import EducationalLevelRepository
@@ -8,7 +8,7 @@ from core.domain.group.repositories import GroupRepository
 from core.domain.lesson.repository import LessonRepository
 from core.domain.subject.repositories import SubjectRepository
 from core.domain.teacher.repositories import TeacherRepository
-from core.impls.neo.mappers.neo_record_to_domain_mapper import NeoRecordToDomainMapper
+from core.impls.alchemy.mappers.alchemy_to_domain_mapper import AlchemyToDomainMapper
 from scraping.scrapers.groups_scraper import GroupsScraper
 from scraping.scrapers.lessons_scraper import LessonsScraper
 from tests.scraping.dummies.groups_client import DummyGroupsClient
@@ -35,9 +35,14 @@ def lessons_client(
     lessons_client_response_size: int,
     session: AsyncSession,
     faker: Faker,
-    mapper: NeoRecordToDomainMapper,
+    alchemy_to_domain_mapper: AlchemyToDomainMapper,
 ) -> DummyLessonsClient:
-    return DummyLessonsClient(lessons_client_response_size, session, faker, mapper)
+    return DummyLessonsClient(
+        lessons_client_response_size,
+        session,
+        faker,
+        alchemy_to_domain_mapper,
+    )
 
 
 @pytest.fixture()

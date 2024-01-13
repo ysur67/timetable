@@ -1,14 +1,13 @@
 from datetime import UTC, date, datetime
 
 import pytest
-from neo4j import AsyncSession
+from sqlalchemy.ext.asyncio import AsyncSession
 
 from core.domain.lesson.dtos import GetLessonsReportDto
 from core.domain.lesson.query.lessons_report import LessonsReportQuery
 from core.models.group import Group
 from core.models.lesson import Lesson
 from tests.factories.lesson_factory import LessonFactory
-from tests.utils.models.lessons.create_lesson import create_lesson
 
 pytestmark = [pytest.mark.anyio]
 
@@ -36,26 +35,20 @@ async def test_returns_actual_lesson_filtered_by_dates(
     group: Group,
 ) -> None:
     current_date = datetime.now(UTC).date()
-    current_year_lessons = [
-        await create_lesson(
-            session,
-            LessonFactory.build(
-                group=group,
-                date_=current_date,
-            ),
-        )
-        for _ in range(3)
-    ]
-    next_year_lessons = [
-        await create_lesson(
-            session,
-            LessonFactory.build(
-                group=group,
-                date_=current_date.replace(year=current_date.year + 1),
-            ),
-        )
-        for _ in range(3)
-    ]
+    current_year_lessons = LessonFactory.build_batch(
+        3,
+        group_id=str(group.id),
+        date_=current_date,
+    )
+    session.add_all(current_year_lessons)
+    await session.flush()
+    next_year_lessons = LessonFactory.build_batch(
+        3,
+        group_id=str(group.id),
+        date_=current_date.replace(year=current_date.year + 1),
+    )
+    session.add_all(next_year_lessons)
+    await session.flush()
     result = await get_lessons_report_query.execute(
         GetLessonsReportDto(
             start_date=current_date.replace(month=1, day=1),
@@ -63,6 +56,7 @@ async def test_returns_actual_lesson_filtered_by_dates(
             group=group,
         ),
     )
+
     assert len(result.lessons) == len(current_year_lessons)
     current_year_ids = {lesson.id for lesson in current_year_lessons}
     for lesson in result.lessons:

@@ -27,5 +27,5 @@ class UserPreferences(Base):
     report_days_offset: Mapped[int]
     user_id: Mapped[uuid_str] = mapped_column(ForeignKey("user.id"))
 
-    selected_group: Mapped["Group"] = relationship(back_populates="users")
+    selected_group: Mapped["Group"] = relationship(back_populates="user_preferences")
     user: Mapped["User"] = relationship(back_populates="preferences")
