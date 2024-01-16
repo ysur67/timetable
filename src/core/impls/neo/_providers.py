@@ -4,7 +4,6 @@ from typing import Any
 import aioinject
 
 from core.domain.classroom.repositories import ClassroomRepository
-from core.domain.educational_level.queries.get_all import GetAllEducationalLevelsQuery
 from core.domain.educational_level.repositories import EducationalLevelRepository
 from core.domain.group.queries.get_by_educational_level import (
     GetGroupsByEducationalLevelQuery,
@@ -16,9 +15,6 @@ from core.domain.subject.repositories import SubjectRepository
 from core.domain.teacher.repositories import TeacherRepository
 from core.domain.user.repositories import UserRepository
 from core.impls.neo.domain.classroom.repositories import NeoClassroomRepository
-from core.impls.neo.domain.educational_level.queries.get_all import (
-    NeoGetAllEducationalLevelsQuery,
-)
 from core.impls.neo.domain.educational_level.repositories import (
     NeoEducationalLevelRepository,
 )
@@ -42,7 +38,6 @@ providers: Iterable[aioinject.Provider[Any]] = [
     aioinject.Callable(NeoClassroomRepository, ClassroomRepository),
     aioinject.Callable(NeoLessonRepository, LessonRepository),
     aioinject.Callable(NeoUserRepository, UserRepository),
-    aioinject.Callable(NeoGetAllEducationalLevelsQuery, GetAllEducationalLevelsQuery),
     aioinject.Callable(
         NeoGetGroupsByEducationalLevelQuery,
         GetGroupsByEducationalLevelQuery,

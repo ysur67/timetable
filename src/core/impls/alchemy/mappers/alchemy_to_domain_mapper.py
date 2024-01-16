@@ -1,7 +1,9 @@
+import uuid
+
 from core.impls.alchemy import tables
 from core.models.classroom import Classroom
 from core.models.educational_level import EducationalLevel
-from core.models.group import Group
+from core.models.group import Group, GroupExternalId, GroupId
 from core.models.lesson import Lesson
 from core.models.subject import Subject
 from core.models.teacher import Teacher
@@ -13,7 +15,12 @@ class AlchemyToDomainMapper:
         return Classroom.model_validate(table)
 
     def map_group(self, table: tables.Group) -> Group:
-        return Group.model_validate(table)
+        return Group(
+            id=GroupId(uuid.UUID(table.id)),
+            external_id=GroupExternalId(table.code),
+            title=table.title,
+            level=self.map_educational_level(table.level),
+        )
 
     def map_subject(self, table: tables.Subject) -> Subject:
         return Subject.model_validate(table)

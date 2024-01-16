@@ -1,6 +1,7 @@
 import pytest
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from core.impls.alchemy import tables
 from core.impls.alchemy.mappers.alchemy_to_domain_mapper import AlchemyToDomainMapper
 from core.models import EducationalLevel, Group
 from core.models.lesson import Lesson
@@ -28,9 +29,12 @@ async def group(
     educational_level: EducationalLevel,
     alchemy_to_domain_mapper: AlchemyToDomainMapper,
 ) -> Group:
-    group = GroupFactory.build(level=educational_level)
+    group = GroupFactory.build(level_id=str(educational_level.id))
     session.add(group)
     await session.flush()
+    level = await session.get(tables.EducationalLevel, group.level_id)
+    assert level is not None
+    group.level = level
     return alchemy_to_domain_mapper.map_group(group)
 
 
