@@ -6,6 +6,7 @@ from core import models
 from core.domain.user.repositories import UserRepository
 from core.impls.alchemy.mappers.alchemy_to_domain_mapper import AlchemyToDomainMapper
 from core.impls.alchemy.mappers.domain_to_alchemy_mapper import DomainToAlchemyMapper
+from core.impls.alchemy.tables.group import Group
 from core.impls.alchemy.tables.user import User, UserPreferences
 
 
@@ -27,7 +28,11 @@ class AlchemyUserRepository(UserRepository):
         stmt = (
             select(User)
             .where(User.telegram_id == ident)
-            .options(joinedload(User.preferences))
+            .options(
+                joinedload(User.preferences)
+                .joinedload(UserPreferences.selected_group)
+                .joinedload(Group.level),
+            )
         )
         model = await self._session.scalar(stmt)
         if model is None:

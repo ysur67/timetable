@@ -15,7 +15,7 @@ from scraping.scrapers.lessons_scraper import LessonsScraper
 
 @contextlib.asynccontextmanager
 async def create_httpx_client() -> AsyncIterator[httpx.AsyncClient]:
-    async with httpx.AsyncClient() as client:
+    async with httpx.AsyncClient(timeout=60) as client:
         yield client
 
 

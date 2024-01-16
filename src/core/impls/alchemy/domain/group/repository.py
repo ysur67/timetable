@@ -26,7 +26,7 @@ class AlchemyGroupRepository(GroupRepository):
         self._from_domain = from_domain_mapper
 
     async def get_all(self) -> Iterable[models.Group]:
-        stmt = select(Group)
+        stmt = select(Group).options(joinedload(Group.level))
         result = await self._session.scalars(stmt)
         return [self._to_domain.map_group(group) for group in result.all()]
 
@@ -34,7 +34,11 @@ class AlchemyGroupRepository(GroupRepository):
         self,
         level_id: EducationalLevelId,
     ) -> Sequence[models.Group]:
-        stmt = select(Group).where(Group.level_id == level_id)
+        stmt = (
+            select(Group)
+            .where(Group.level_id == level_id)
+            .options(joinedload(Group.level))
+        )
         result = await self._session.scalars(stmt)
         return [self._to_domain.map_group(group) for group in result.all()]
 
@@ -59,7 +63,13 @@ class AlchemyGroupRepository(GroupRepository):
         return self._to_domain.map_group(model)
 
     async def get_by_id(self, ident: models.GroupId) -> models.Group | None:
-        model = await self._session.get(Group, str(ident))
+        model = await self._session.get(
+            Group,
+            str(ident),
+            options=[
+                joinedload(Group.level),
+            ],
+        )
         if model is None:
             return None
         return self._to_domain.map_group(model)

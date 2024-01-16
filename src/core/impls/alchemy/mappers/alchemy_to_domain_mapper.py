@@ -7,7 +7,7 @@ from core.models.group import Group, GroupExternalId, GroupId, SimpleGroup
 from core.models.lesson import Lesson, LessonId
 from core.models.subject import Subject
 from core.models.teacher import Teacher
-from core.models.user import User
+from core.models.user import User, UserId, UserPreferences, UserTelegramId
 
 
 class AlchemyToDomainMapper:
@@ -39,7 +39,21 @@ class AlchemyToDomainMapper:
         return EducationalLevel.model_validate(table)
 
     def map_user(self, table: tables.User) -> User:
-        return User.model_validate(table)
+        return User(
+            id=UserId(uuid.UUID(table.id)),
+            telegram_id=UserTelegramId(int(table.telegram_id)),
+            preferences=self._map_user_preferences(table),
+        )
+
+    def _map_user_preferences(self, table: tables.User) -> UserPreferences:
+        prefs = table.preferences
+        selected_group: Group | None = None
+        if prefs.selected_group is not None:
+            selected_group = self.map_group(prefs.selected_group)
+        return UserPreferences(
+            report_days_offset=table.preferences.report_days_offset,
+            selected_group=selected_group,
+        )
 
     def map_lesson(self, table: tables.Lesson) -> Lesson:
         group = self.map_simple_group(table.group)

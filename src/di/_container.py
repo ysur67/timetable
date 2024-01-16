@@ -9,7 +9,7 @@ from pydantic_settings import BaseSettings
 import scraping
 from adapters.telegram.dependencies import create_bot
 from core.domain import lesson, user
-from core.impls import neo
+from core.impls import alchemy
 from core.impls.alchemy.deps import get_alchemy_session, get_engine
 from core.impls.neo.dependencies import get_driver
 from lib.settings import NeoSettings, get_settings
@@ -19,7 +19,7 @@ from lib.settings.telegram import TelegramSettings
 SETTINGS = (NeoSettings, TelegramSettings, SqliteSettings)
 
 MODULES: Iterable[Iterable[aioinject.Provider[Any]]] = [
-    neo.providers,
+    alchemy.providers,
     scraping.providers,
     lesson.providers,
     user.providers,
@@ -39,7 +39,6 @@ def _register_settings(
 @functools.lru_cache
 def create_container() -> aioinject.Container:
     container = aioinject.Container()
-    _init_neo4j(container)
     _init_sqlalchemy(container)
     container.register(aioinject.Singleton(create_bot))
 
