@@ -1,11 +1,11 @@
 import uuid
 
-from core.domain.classroom.services import ClassroomService
+from core.domain.classroom.repositories import ClassroomRepository
 from core.domain.educational_level.repositories import EducationalLevelRepository
 from core.domain.group.repositories import GroupRepository
-from core.domain.lesson.services import LessonService
-from core.domain.subject.services import SubjectService
-from core.domain.teacher.services import TeacherService
+from core.domain.lesson.repository import LessonRepository
+from core.domain.subject.repositories import SubjectRepository
+from core.domain.teacher.repositories import TeacherRepository
 from core.models import (
     Classroom,
     ClassroomId,
@@ -28,18 +28,18 @@ class LessonsScraper:
         lessons_client: LessonsClient,
         educational_level_repository: EducationalLevelRepository,
         group_repository: GroupRepository,
-        teacher_service: TeacherService,
-        subject_service: SubjectService,
-        classroom_service: ClassroomService,
-        lesson_service: LessonService,
+        teacher_repository: TeacherRepository,
+        subject_repository: SubjectRepository,
+        classroom_repository: ClassroomRepository,
+        lesson_repository: LessonRepository,
     ) -> None:
         self._client = lessons_client
         self._educational_level_repo = educational_level_repository
         self._group_repository = group_repository
-        self._teacher_service = teacher_service
-        self._subject_service = subject_service
-        self._classroom_service = classroom_service
-        self._lesson_service = lesson_service
+        self._teacher_repository = teacher_repository
+        self._subject_repository = subject_repository
+        self._classroom_repository = classroom_repository
+        self._lesson_repository = lesson_repository
         self._logger = get_default_logger(self.__class__.__name__)
 
     async def scrape(self) -> None:
@@ -74,12 +74,12 @@ class LessonsScraper:
                     note=schema.note,
                 )
                 self._logger.info("Creating %s", lesson)
-                await self._lesson_service.get_or_create(lesson)
+                await self._lesson_repository.get_or_create(lesson)
 
     async def _get_teacher(self, schema: LessonSchema) -> Teacher | None:
         if schema.teacher is None:
             return None
-        return await self._teacher_service.get_or_create(
+        return await self._teacher_repository.get_or_create(
             Teacher(
                 id=TeacherId(uuid.uuid4()),
                 name=schema.teacher.name,
@@ -89,7 +89,7 @@ class LessonsScraper:
     async def _get_subject(self, schema: LessonSchema) -> Subject | None:
         if schema.subject is None:
             return None
-        return await self._subject_service.get_or_create(
+        return await self._subject_repository.get_or_create(
             Subject(
                 id=SubjectId(uuid.uuid4()),
                 title=schema.subject.title,
@@ -99,7 +99,7 @@ class LessonsScraper:
     async def _get_classroom(self, schema: LessonSchema) -> Classroom | None:
         if schema.classroom is None:
             return None
-        return await self._classroom_service.get_or_create(
+        return await self._classroom_repository.get_or_create(
             Classroom(
                 id=ClassroomId(uuid.uuid4()),
                 title=schema.classroom.title,

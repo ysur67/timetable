@@ -9,3 +9,6 @@ class SubjectRepository(Protocol):
 
     async def create(self, subject: Subject) -> Subject:
         ...
+
+    async def get_or_create(self, subject: Subject) -> Subject:
+        ...

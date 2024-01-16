@@ -1,12 +1,10 @@
-import uuid
-
 import factory
 
-from core.models import Group
+from core.impls.alchemy.tables.group import Group
 from tests.factories.base import GenericFactory
 
 
 class GroupFactory(GenericFactory[Group]):
-    id = factory.LazyFunction(uuid.uuid4)
+    id = factory.Faker("uuid4")
     title = factory.Faker("pystr")
-    external_id = factory.Faker("pystr")
+    code = factory.Faker("uuid4")

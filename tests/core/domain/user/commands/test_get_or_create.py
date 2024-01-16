@@ -1,10 +1,12 @@
 import sys
 
 import pytest
-from neo4j import AsyncSession
+from sqlalchemy import select
+from sqlalchemy.ext.asyncio import AsyncSession
 
 from core.domain.user.commands.get_or_create_user import GetOrCreateUserCommand
 from core.domain.user.dtos import GetOrCreateUserDto
+from core.impls.alchemy import tables
 from core.models import User, UserTelegramId
 
 pytestmark = [pytest.mark.anyio]
@@ -42,14 +44,8 @@ async def _get_user_exists(
     session: AsyncSession,
     user_id: UserTelegramId,
 ) -> tuple[bool, int]:
-    stmt = """
-        match (user:User)
-            where user.telegram_id = $user_id
-        return user, count(*) as count;
-    """
-    result = await session.run(stmt, parameters={"user_id": user_id})
-    record = await result.single()
-    if record is None:
-        return (False, 0)
-    data = record.data()
-    return (True, int(data["count"]))
+    stmt = select(tables.User).where(tables.User.telegram_id == user_id)
+    result = await session.scalars(stmt)
+    records = result.all()
+    users_count = len(records)
+    return users_count > 0, users_count

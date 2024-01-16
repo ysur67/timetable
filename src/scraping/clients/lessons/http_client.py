@@ -120,6 +120,8 @@ class HttpLessonsClient(LessonsClient):
         ) is not None:
             starts, ends = time_range
         classroom = self._parse_classroom(tds[classroom_ind])
+        subject: SubjectSchema | None = None
+        href = ""
         if (subj_result := self._parse_subject(tds[subject_ind])) is not None:
             subject, href = subj_result
         teacher = self._parse_teacher(tds[teacher_ind])
@@ -235,8 +237,8 @@ class HttpLessonsClient(LessonsClient):
     def _build_request_params(self, level: EducationalLevel) -> _LessonsRequestParams:
         return _LessonsRequestParams(
             ucstep=level.code,
-            datafrom=_LessonsRequestParams.date_to_request(date(2023, 12, 17)),
-            dataend=_LessonsRequestParams.date_to_request(date(2023, 12, 30)),
+            datafrom=_LessonsRequestParams.date_to_request(date(2023, 1, 15)),
+            dataend=_LessonsRequestParams.date_to_request(date(2023, 2, 15)),
         )
 
     def _get_url_from_string(self, value: str) -> str:

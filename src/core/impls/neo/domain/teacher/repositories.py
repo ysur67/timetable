@@ -1,5 +1,3 @@
-from typing import final
-
 from neo4j import AsyncSession
 
 from core.domain.teacher.repositories import TeacherRepository
@@ -7,7 +5,6 @@ from core.impls.neo.mappers.neo_record_to_domain_mapper import NeoRecordToDomain
 from core.models import Teacher
 
 
-@final
 class NeoTeacherRepository(TeacherRepository):
     def __init__(
         self,

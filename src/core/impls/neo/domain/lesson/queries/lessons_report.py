@@ -1,7 +1,7 @@
 from typing import final
 
 from core.domain.lesson.dtos import GetLessonsReportDto
-from core.domain.lesson.query.lessons_report import LessonsReportQuery
+from core.domain.lesson.queries.lessons_report import LessonsReportQuery
 from core.domain.lesson.repository import LessonRepository, LessonsFilter
 from core.models.lessons_report import LessonsReport
 

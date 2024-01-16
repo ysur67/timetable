@@ -1,9 +1,8 @@
 from collections.abc import Iterable, Sequence
 from typing import Protocol
 
-from core.models import Group
 from core.models.educational_level import EducationalLevelId
-from core.models.group import GroupId
+from core.models.group import Group, GroupId
 
 
 class GroupRepository(Protocol):
