@@ -5,7 +5,7 @@ tasks:
     cmds:
       - "ruff check . --fix --show-fixes"
       - "black ."
-      - "ruff check . --fix --show-fixes"
+      - "ruff . --fix --show-fixes"
       - "mypy ."
       # - "deptry ."
       # - "isort ."

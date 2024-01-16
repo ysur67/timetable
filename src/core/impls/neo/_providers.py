@@ -9,7 +9,7 @@ from core.domain.group.queries.get_by_educational_level import (
     GetGroupsByEducationalLevelQuery,
 )
 from core.domain.group.repositories import GroupRepository
-from core.domain.lesson.query.lessons_report import LessonsReportQuery
+from core.domain.lesson.queries.lessons_report import LessonsReportQuery
 from core.domain.lesson.repository import LessonRepository
 from core.domain.subject.repositories import SubjectRepository
 from core.domain.teacher.repositories import TeacherRepository

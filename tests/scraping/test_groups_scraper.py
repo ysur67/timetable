@@ -9,6 +9,7 @@ from tests.scraping.dummies.groups_client import DummyGroupsClient
 pytestmark = [pytest.mark.anyio]
 
 
+@pytest.mark.usefixtures("educational_level")
 async def test_scrape_creates_actual_valid_data(
     groups_scraper: GroupsScraper,
     groups_client: DummyGroupsClient,

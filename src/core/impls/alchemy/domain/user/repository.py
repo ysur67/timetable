@@ -51,7 +51,7 @@ class AlchemyUserRepository(UserRepository):
                 UserPreferences.user_id == str(user.id),
             )
             .values(
-                selected_group_id=group_id,
+                selected_group_id=str(group_id),
                 report_days_offset=user.preferences.report_days_offset,
             )
         )

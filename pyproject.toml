@@ -117,7 +117,6 @@ ignore = [
     "TD003",
     "FIX002",
 ]
-
 target-version = "py312"
 src = ["src", "tests"]
 select = ["ALL"]

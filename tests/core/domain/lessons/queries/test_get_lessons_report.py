@@ -1,10 +1,11 @@
 from datetime import UTC, date, datetime
+from uuid import UUID
 
 import pytest
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from core.domain.lesson.dtos import GetLessonsReportDto
-from core.domain.lesson.query.lessons_report import LessonsReportQuery
+from core.domain.lesson.queries.lessons_report import LessonsReportQuery
 from core.models.group import Group
 from core.models.lesson import Lesson
 from tests.factories.lesson_factory import LessonFactory
@@ -58,7 +59,7 @@ async def test_returns_actual_lesson_filtered_by_dates(
     )
 
     assert len(result.lessons) == len(current_year_lessons)
-    current_year_ids = {lesson.id for lesson in current_year_lessons}
+    current_year_ids = {UUID(lesson.id) for lesson in current_year_lessons}
     for lesson in result.lessons:
         assert lesson.id in current_year_ids
         assert lesson.date_.year == current_date.year
@@ -71,7 +72,7 @@ async def test_returns_actual_lesson_filtered_by_dates(
         ),
     )
     assert len(result.lessons) == len(next_year_lessons)
-    next_year_ids = {lesson.id for lesson in next_year_lessons}
+    next_year_ids = {UUID(lesson.id) for lesson in next_year_lessons}
     for lesson in result.lessons:
         assert lesson.id in next_year_ids
         assert lesson.date_.year == current_date.year + 1

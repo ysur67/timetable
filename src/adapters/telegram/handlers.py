@@ -20,7 +20,7 @@ from core.domain.group.queries.get_by_educational_level import (
     GetGroupsByEducationalLevelQuery,
 )
 from core.domain.lesson.dtos import GetLessonsReportDto
-from core.domain.lesson.query.lessons_report import LessonsReportQuery
+from core.domain.lesson.queries.lessons_report import LessonsReportQuery
 from core.domain.lesson.report_renderer import ReportRenderer
 from core.domain.user.commands.set_selected_group import SetSelectedGroupCommand
 from core.domain.user.dtos import SetSelectedGroupDto

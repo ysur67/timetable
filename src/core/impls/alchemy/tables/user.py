@@ -3,7 +3,7 @@ from typing import TYPE_CHECKING
 from sqlalchemy import ForeignKey, UniqueConstraint
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
-from core.impls.alchemy.base import Base, int64_pk, uuid_str, uuid_str_pk
+from core.impls.alchemy.base import Base, uuid_str, uuid_str_pk
 
 if TYPE_CHECKING:
     from core.impls.alchemy.tables.group import Group
@@ -22,8 +22,8 @@ class UserPreferences(Base):
     __tablename__ = "user_preferences"
     __table_args__ = (UniqueConstraint("user_id"),)
 
-    id: Mapped[int64_pk]
-    selected_group_id: Mapped[uuid_str] = mapped_column(ForeignKey("group.id"))
+    id: Mapped[uuid_str_pk]
+    selected_group_id: Mapped[uuid_str | None] = mapped_column(ForeignKey("group.id"))
     report_days_offset: Mapped[int]
     user_id: Mapped[uuid_str] = mapped_column(ForeignKey("user.id"))
 

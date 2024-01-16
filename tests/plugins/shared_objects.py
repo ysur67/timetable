@@ -59,7 +59,10 @@ async def lesson(
     group: Group,
     alchemy_to_domain_mapper: AlchemyToDomainMapper,
 ) -> Lesson:
-    lesson = LessonFactory.build(group_id=group.id)
+    lesson = LessonFactory.build(group_id=str(group.id))
     session.add(lesson)
     await session.flush()
+    db_group = await session.get(tables.Group, str(group.id))
+    assert db_group is not None
+    lesson.group = db_group
     return alchemy_to_domain_mapper.map_lesson(lesson)

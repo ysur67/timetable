@@ -1,8 +1,8 @@
 """empty message
 
-Revision ID: 693dc8c7374c
+Revision ID: ce2a62e1057e
 Revises:
-Create Date: 2024-01-16 23:14:19.816357
+Create Date: 2024-01-16 23:29:58.557582
 
 """
 from collections.abc import Sequence
@@ -11,7 +11,7 @@ import sqlalchemy as sa
 from alembic import op
 
 # revision identifiers, used by Alembic.
-revision: str = "693dc8c7374c"
+revision: str = "ce2a62e1057e"
 down_revision: str | None = None
 branch_labels: str | Sequence[str] | None = None
 depends_on: str | Sequence[str] | None = None
@@ -100,8 +100,8 @@ def upgrade() -> None:
     )
     op.create_table(
         "user_preferences",
-        sa.Column("id", sa.BigInteger(), nullable=False),
-        sa.Column("selected_group_id", sa.String(length=32), nullable=False),
+        sa.Column("id", sa.String(length=32), nullable=False),
+        sa.Column("selected_group_id", sa.String(length=32), nullable=True),
         sa.Column("report_days_offset", sa.Integer(), nullable=False),
         sa.Column("user_id", sa.String(length=32), nullable=False),
         sa.ForeignKeyConstraint(

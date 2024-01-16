@@ -3,6 +3,7 @@ from typing import final
 
 from sqlalchemy import func, select
 from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.orm import joinedload
 
 from core import models
 from core.domain.group.repositories import GroupRepository
@@ -47,14 +48,18 @@ class AlchemyGroupRepository(GroupRepository):
         return groups
 
     async def get_by_title(self, title: str) -> models.Group | None:
-        stmt = select(Group).where(func.lower(Group.title) == title)
+        stmt = (
+            select(Group)
+            .where(func.lower(Group.title) == title.lower())
+            .options(joinedload(Group.level))
+        )
         model = await self._session.scalar(stmt)
         if model is None:
             return None
         return self._to_domain.map_group(model)
 
     async def get_by_id(self, ident: models.GroupId) -> models.Group | None:
-        model = await self._session.get(Group, ident)
+        model = await self._session.get(Group, str(ident))
         if model is None:
             return None
         return self._to_domain.map_group(model)

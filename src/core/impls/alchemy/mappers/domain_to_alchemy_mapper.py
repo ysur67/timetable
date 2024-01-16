@@ -13,7 +13,12 @@ class DomainToAlchemyMapper:
         return tables.Classroom(title=domain.title)
 
     def map_group(self, domain: Group) -> tables.Group:
-        return tables.Group(title=domain.title, level_id=domain.level.id)
+        return tables.Group(
+            id=str(domain.id),
+            title=domain.title,
+            level_id=str(domain.level.id),
+            code=domain.external_id,
+        )
 
     def map_subject(self, domain: Subject) -> tables.Subject:
         return tables.Subject(title=domain.title)
@@ -29,6 +34,7 @@ class DomainToAlchemyMapper:
 
     def map_user(self, domain: User) -> tables.User:
         return tables.User(
+            id=str(domain.id),
             telegram_id=domain.telegram_id,
             preferences=self._map_user_preferences(domain),
         )
@@ -46,10 +52,11 @@ class DomainToAlchemyMapper:
 
     def map_lesson(self, domain: Lesson) -> tables.Lesson:
         result = tables.Lesson(
+            id=str(domain.id),
             date_=domain.date_,
             time_start=domain.time_start,
             time_end=domain.time_end,
-            group_id=domain.group.id,
+            group_id=str(domain.group.id),
             link=domain.link,
             note=domain.note,
             hash_=domain.get_hash(),

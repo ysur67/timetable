@@ -5,6 +5,7 @@ from typing import Final, final
 from faker import Faker
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.orm import joinedload
 
 from core.impls.alchemy import tables
 from core.impls.alchemy.mappers.alchemy_to_domain_mapper import AlchemyToDomainMapper
@@ -32,7 +33,11 @@ class DummyLessonsClient(LessonsClient):
         self._mapper = mapper
 
     async def get_all(self, level: EducationalLevel) -> Sequence[LessonSchema]:
-        stmt = select(tables.Group).where(tables.Group.level_id == str(level.id))
+        stmt = (
+            select(tables.Group)
+            .where(tables.Group.level_id == str(level.id))
+            .options(joinedload(tables.Group.level))
+        )
         group_model = await self._session.scalar(stmt)
         if group_model is None:
             return []
