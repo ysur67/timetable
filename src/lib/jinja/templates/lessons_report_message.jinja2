@@ -1,4 +1,4 @@
-Расписание с {{ report.date_start }} по {{ report.date_end }}
+{% include 'report_title.jinja2' %}
 {% for lesson in report.lessons %}
 Дата: {{ lesson.date_ }}
 Начало: {{ lesson.time_start }}
