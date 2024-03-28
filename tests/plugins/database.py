@@ -41,7 +41,7 @@ async def _sqlalchemy_create_database(
     dir_ = pathlib.Path(__file__).parent.resolve()
     db_file = dir_ / database_name
     db_file.unlink(missing_ok=True)
-    pathlib.Path(db_file).open("a").close()
+    pathlib.Path(db_file).open("a").close()  # noqa: ASYNC101
     _ = create_async_engine(
         database_url,
         execution_options={"isolation_level": "AUTOCOMMIT"},

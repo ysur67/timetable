@@ -6,5 +6,4 @@ from scraping.schemas import LessonSchema
 
 
 class LessonsClient(Protocol):
-    async def get_all(self, level: EducationalLevel) -> Sequence[LessonSchema]:
-        ...
+    async def get_all(self, level: EducationalLevel) -> Sequence[LessonSchema]: ...

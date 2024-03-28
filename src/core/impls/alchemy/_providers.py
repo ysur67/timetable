@@ -39,19 +39,19 @@ from core.impls.alchemy.mappers.domain_to_alchemy_mapper import DomainToAlchemyM
 providers: Iterable[aioinject.Provider[Any]] = [
     aioinject.Singleton(AlchemyToDomainMapper),
     aioinject.Singleton(DomainToAlchemyMapper),
-    aioinject.Callable(AlchemyEducationalLevelRepository, EducationalLevelRepository),
-    aioinject.Callable(AlchemyGroupRepository, GroupRepository),
-    aioinject.Callable(AlchemyTeacherRepository, TeacherRepository),
-    aioinject.Callable(AlchemySubjectRepository, SubjectRepository),
-    aioinject.Callable(AlchemyClassroomRepository, ClassroomRepository),
-    aioinject.Callable(AlchemyLessonRepository, LessonRepository),
-    aioinject.Callable(AlchemyUserRepository, UserRepository),
-    aioinject.Callable(
+    aioinject.Scoped(AlchemyEducationalLevelRepository, EducationalLevelRepository),
+    aioinject.Scoped(AlchemyGroupRepository, GroupRepository),
+    aioinject.Scoped(AlchemyTeacherRepository, TeacherRepository),
+    aioinject.Scoped(AlchemySubjectRepository, SubjectRepository),
+    aioinject.Scoped(AlchemyClassroomRepository, ClassroomRepository),
+    aioinject.Scoped(AlchemyLessonRepository, LessonRepository),
+    aioinject.Scoped(AlchemyUserRepository, UserRepository),
+    aioinject.Scoped(
         AlchemyGetGroupsByEducationalLevelQuery,
         GetGroupsByEducationalLevelQuery,
     ),
-    aioinject.Callable(AlchemyLessonsReportQuery, LessonsReportQuery),
-    aioinject.Callable(
+    aioinject.Scoped(AlchemyLessonsReportQuery, LessonsReportQuery),
+    aioinject.Scoped(
         AlchemyGetAllEducationalLevelsQuery,
         GetAllEducationalLevelsQuery,
     ),

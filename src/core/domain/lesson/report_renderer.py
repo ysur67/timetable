@@ -6,8 +6,7 @@ from core.models.lessons_report import LessonsReport
 
 
 class ReportRenderer(Protocol):
-    async def render(self, report: LessonsReport) -> str:
-        ...
+    async def render(self, report: LessonsReport) -> str: ...
 
 
 @final

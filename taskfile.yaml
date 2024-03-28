@@ -5,15 +5,19 @@ tasks:
     cmds:
       - "ruff check . --fix --show-fixes"
       - "black ."
-      - "ruff . --fix --show-fixes"
+      - "ruff check . --fix --show-fixes"
       - "mypy ."
       # - "deptry ."
       # - "isort ."
 
-  test:
+  coverage:
     cmds:
       - "coverage run"
       - "coverage report"
+
+  test:
+    cmds: 
+      - "pytest ."
 
   makemigrations:
     cmds:

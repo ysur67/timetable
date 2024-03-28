@@ -52,9 +52,9 @@ def create_container() -> aioinject.Container:
 
 def _init_neo4j(container: aioinject.Container) -> None:
     container.register(aioinject.Singleton(get_driver))
-    container.register(aioinject.Callable(get_alchemy_session))
+    container.register(aioinject.Scoped(get_alchemy_session))
 
 
 def _init_sqlalchemy(container: aioinject.Container) -> None:
     container.register(aioinject.Singleton(get_engine))
-    container.register(aioinject.Callable(get_alchemy_session))
+    container.register(aioinject.Scoped(get_alchemy_session))

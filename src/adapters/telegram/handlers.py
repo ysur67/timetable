@@ -5,7 +5,7 @@ from typing import Annotated, assert_never
 from aiogram import Bot, Dispatcher, F
 from aiogram.filters import Command, CommandStart, or_f
 from aiogram.fsm.context import FSMContext
-from aiogram.types import CallbackQuery, Message
+from aiogram.types import CallbackQuery, InaccessibleMessage, Message
 from aiogram.utils.keyboard import InlineKeyboardBuilder, ReplyKeyboardBuilder
 from aioinject import Inject, inject
 
@@ -145,6 +145,10 @@ async def handle_educational_level_selection(
     builder.adjust(2)
     if callback.message is None:
         raise Never
+
+    if isinstance(callback.message, InaccessibleMessage):
+        return
+
     await callback.message.answer(
         "Выберите одну из групп",
         reply_markup=builder.as_markup(),

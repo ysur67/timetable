@@ -9,5 +9,5 @@ from lib.jinja.templates import env
 
 providers: Iterable[aioinject.Provider[Any]] = [
     aioinject.Singleton(lambda: env, Environment),
-    aioinject.Callable(JinjaReportRenderer, ReportRenderer),
+    aioinject.Scoped(JinjaReportRenderer, ReportRenderer),
 ]

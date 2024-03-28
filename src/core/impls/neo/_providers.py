@@ -30,17 +30,17 @@ from core.impls.neo.domain.user.repositories import NeoUserRepository
 from core.impls.neo.mappers.neo_record_to_domain_mapper import NeoRecordToDomainMapper
 
 providers: Iterable[aioinject.Provider[Any]] = [
-    aioinject.Callable(NeoRecordToDomainMapper),
-    aioinject.Callable(NeoEducationalLevelRepository, EducationalLevelRepository),
-    aioinject.Callable(NeoGroupRepository, GroupRepository),
-    aioinject.Callable(NeoTeacherRepository, TeacherRepository),
-    aioinject.Callable(NeoSubjectRepository, SubjectRepository),
-    aioinject.Callable(NeoClassroomRepository, ClassroomRepository),
-    aioinject.Callable(NeoLessonRepository, LessonRepository),
-    aioinject.Callable(NeoUserRepository, UserRepository),
-    aioinject.Callable(
+    aioinject.Scoped(NeoRecordToDomainMapper),
+    aioinject.Scoped(NeoEducationalLevelRepository, EducationalLevelRepository),
+    aioinject.Scoped(NeoGroupRepository, GroupRepository),
+    aioinject.Scoped(NeoTeacherRepository, TeacherRepository),
+    aioinject.Scoped(NeoSubjectRepository, SubjectRepository),
+    aioinject.Scoped(NeoClassroomRepository, ClassroomRepository),
+    aioinject.Scoped(NeoLessonRepository, LessonRepository),
+    aioinject.Scoped(NeoUserRepository, UserRepository),
+    aioinject.Scoped(
         NeoGetGroupsByEducationalLevelQuery,
         GetGroupsByEducationalLevelQuery,
     ),
-    aioinject.Callable(NeoLessonsReportQuery, LessonsReportQuery),
+    aioinject.Scoped(NeoLessonsReportQuery, LessonsReportQuery),
 ]

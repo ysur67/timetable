@@ -9,8 +9,7 @@ class Never(Exception):  # noqa: N818
     ...
 
 
-class CoreError(Protocol):
-    ...
+class CoreError(Protocol): ...
 
 
 class EntityNotFoundError(BaseModel, Generic[TModel, TId]):

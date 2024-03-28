@@ -6,5 +6,4 @@ from core.models import Group
 
 
 class GetGroupsByEducationalLevelQuery(Protocol):
-    async def execute(self, dto: GetGroupsByEducationalLevelDto) -> Sequence[Group]:
-        ...
+    async def execute(self, dto: GetGroupsByEducationalLevelDto) -> Sequence[Group]: ...
