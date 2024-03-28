@@ -15,5 +15,8 @@ class JinjaReportRenderer(ReportRenderer):
         self._env = env
 
     async def render(self, report: LessonsReport) -> str:
-        template = self._env.get_template("lessons_report_message.jinja2")
+        if report.lessons:
+            template = self._env.get_template("lessons_report_message.jinja2")
+        else:
+            template = self._env.get_template("empty_lessons_report_message.jinja2")
         return await template.render_async(report=report)

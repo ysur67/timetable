@@ -8,7 +8,12 @@ from aiogram.fsm.context import FSMContext
 from aiogram.types import CallbackQuery, InaccessibleMessage, Message
 from aiogram.utils.keyboard import InlineKeyboardBuilder, ReplyKeyboardBuilder
 from aioinject import Inject, inject
+from result import Err
 
+from adapters.telegram.middlewares.aioinject_ import (
+    AioinjectMiddlware,
+    CallbackAioinjectMiddleware,
+)
 from adapters.telegram.middlewares.current_user import (
     CallbackCurrentUserMiddleware,
     ChatCurrentUserMiddleware,
@@ -27,9 +32,14 @@ from core.domain.user.dtos import SetSelectedGroupDto
 from core.errors import EntityNotFoundError, Never
 from core.models.group import GroupId
 from core.models.user import User
+from di import create_container
 from lib.dates import utc_now
 
 dispatcher = Dispatcher()
+dispatcher.message.middleware(AioinjectMiddlware(container=create_container()))
+dispatcher.callback_query.middleware(
+    CallbackAioinjectMiddleware(container=create_container()),
+)
 dispatcher.message.middleware(ChatCurrentUserMiddleware())
 dispatcher.callback_query.middleware(CallbackCurrentUserMiddleware())
 
@@ -85,7 +95,7 @@ async def handle_get_schedule(
         ),
     )
     result = await renderer.render(report)
-    await bot.send_message(message.chat.id, result)
+    await bot.send_message(message.chat.id, result, parse_mode="HTML")
 
 
 @dispatcher.message(
@@ -169,15 +179,17 @@ async def handle_group_selection(
             user=user,
         ),
     )
-    if (err := result.err()) is not None:
+    if isinstance(result, Err):
+        err = result.err_value
         match err:
             case EntityNotFoundError():
                 await callback.answer(
                     "Не удалось найти выбранную группу...",
                     show_alert=True,
                 )
+                return
             case _ as never:
                 assert_never(never)
-    group = result.unwrap()
+    group = result.ok_value
     await state.clear()
     await callback.answer(f"Группа {group.title} успешно выбрана")

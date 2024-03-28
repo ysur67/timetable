@@ -61,4 +61,5 @@ class AlchemyUserRepository(UserRepository):
             )
         )
         await self._session.execute(stmt)
+        await self._session.flush()
         return user

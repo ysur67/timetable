@@ -11,7 +11,7 @@ from adapters.telegram.dependencies import create_bot
 from core.domain import lesson, user
 from core.impls import alchemy
 from core.impls.alchemy.deps import get_alchemy_session, get_engine
-from core.impls.neo.dependencies import get_driver
+from core.impls.neo.dependencies import get_driver, get_session
 from lib.settings import NeoSettings, get_settings
 from lib.settings.database import SqliteSettings
 from lib.settings.telegram import TelegramSettings
@@ -52,9 +52,9 @@ def create_container() -> aioinject.Container:
 
 def _init_neo4j(container: aioinject.Container) -> None:
     container.register(aioinject.Singleton(get_driver))
-    container.register(aioinject.Scoped(get_alchemy_session))
+    container.register(aioinject.Scoped(get_session))
 
 
 def _init_sqlalchemy(container: aioinject.Container) -> None:
     container.register(aioinject.Singleton(get_engine))
-    container.register(aioinject.Scoped(get_alchemy_session))
+    container.register(aioinject.Transient(get_alchemy_session))

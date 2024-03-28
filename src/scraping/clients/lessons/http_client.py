@@ -1,7 +1,7 @@
 import operator
 import re
 from collections.abc import Sequence
-from datetime import UTC, date, datetime, time
+from datetime import UTC, date, datetime, time, timedelta
 from functools import reduce
 from typing import Final, final
 
@@ -235,10 +235,13 @@ class HttpLessonsClient(LessonsClient):
         return HTMLParser(response.text)
 
     def _build_request_params(self, level: EducationalLevel) -> _LessonsRequestParams:
+        today = datetime.now(tz=UTC).date()
+        start_date = today - timedelta(days=7)
+        finish_date = today + timedelta(days=40)
         return _LessonsRequestParams(
             ucstep=level.code,
-            datafrom=_LessonsRequestParams.date_to_request(date(2023, 1, 15)),
-            dataend=_LessonsRequestParams.date_to_request(date(2023, 2, 15)),
+            datafrom=_LessonsRequestParams.date_to_request(start_date),
+            dataend=_LessonsRequestParams.date_to_request(finish_date),
         )
 
     def _get_url_from_string(self, value: str) -> str:
