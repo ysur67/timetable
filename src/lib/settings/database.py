@@ -27,4 +27,4 @@ class SqliteSettings(BaseSettings):
 
     @property
     def url(self) -> str:
-        return f"{self.driver}://{self.filename}"
+        return f"{self.driver}:///{self.filename}"
