@@ -16,7 +16,7 @@ class NeoRecordToDomainMapper:
     def map_user(self, record: dict[str, Any]) -> User:
         data: dict[str, Any] = record["user"]
         preferences = UserPreferences.empty()
-        if record.get("group", None) is not None:
+        if record.get("group") is not None:
             preferences = UserPreferences(selected_group=self.map_group(record))
         return User(
             id=data["id"],

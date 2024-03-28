@@ -7,6 +7,6 @@ from core.domain.user.commands.get_or_create_user import GetOrCreateUserCommand
 from core.domain.user.commands.set_selected_group import SetSelectedGroupCommand
 
 providers: Iterable[aioinject.Provider[Any]] = [
-    aioinject.Callable(GetOrCreateUserCommand),
-    aioinject.Callable(SetSelectedGroupCommand),
+    aioinject.Scoped(GetOrCreateUserCommand),
+    aioinject.Scoped(SetSelectedGroupCommand),
 ]

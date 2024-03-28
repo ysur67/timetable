@@ -15,14 +15,14 @@ from scraping.scrapers.lessons_scraper import LessonsScraper
 
 @contextlib.asynccontextmanager
 async def create_httpx_client() -> AsyncIterator[httpx.AsyncClient]:
-    async with httpx.AsyncClient() as client:
+    async with httpx.AsyncClient(timeout=60) as client:
         yield client
 
 
 providers: Iterable[aioinject.Provider[Any]] = [
-    aioinject.Callable(create_httpx_client),
-    aioinject.Callable(HttpGroupsClient, type_=GroupsClient),
-    aioinject.Callable(HttpLessonsClient, type_=LessonsClient),
-    aioinject.Callable(GroupsScraper),
-    aioinject.Callable(LessonsScraper),
+    aioinject.Scoped(create_httpx_client),
+    aioinject.Scoped(HttpGroupsClient, type_=GroupsClient),
+    aioinject.Scoped(HttpLessonsClient, type_=LessonsClient),
+    aioinject.Scoped(GroupsScraper),
+    aioinject.Scoped(LessonsScraper),
 ]

@@ -17,6 +17,7 @@ dependencies = [
     "selectolax>=0.3.17",
     "aiogram>=3.2.0",
     "jinja2>=3.1.2",
+    "SQLAlchemy>=2.0.29",
 ]
 requires-python = ">=3.12"
 readme = "README.md"
@@ -48,7 +49,7 @@ filterwarnings = [
 
 [tool.coverage.run]
 source = ["src"]
-omit = ["tests/"]
+omit = ["tests/", "src/alembic/*"]
 command_line = "-m pytest -vv"
 concurrency = ["greenlet", "thread"]
 
@@ -97,6 +98,10 @@ strict_equality = true
 
 
 [tool.ruff]
+target-version = "py312"
+src = ["src", "tests"]
+
+[tool.ruff.lint]
 ignore = [
     "UP017",  # Use `datetime.UTC` alias, This clashes with imported `datetime` class
     "E501",   # Line Length
@@ -117,19 +122,15 @@ ignore = [
     "TD003",
     "FIX002",
 ]
-
-target-version = "py312"
-src = ["src", "tests"]
+fixable = ["F", "E", "W", "I", "COM", "UP", "RUF"] 
 select = ["ALL"]
-fixable = ["F", "E", "W", "I", "COM", "UP", "RUF"]
 
-
-[tool.ruff.per-file-ignores]
+[tool.ruff.lint.per-file-ignores]
 "tests/*" = ["S101", "S311"]
 "tests/*/test_*.py" = ["PLR0913"]
 
 
-[tool.ruff.pep8-naming]
+[tool.ruff.lint.pep8-naming]
 classmethod-decorators = [
     "classmethod",
     "pydantic.validator",

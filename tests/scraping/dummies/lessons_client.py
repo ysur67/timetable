@@ -3,9 +3,12 @@ from collections.abc import Sequence
 from typing import Final, final
 
 from faker import Faker
-from neo4j import AsyncSession
+from sqlalchemy import select
+from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.orm import joinedload
 
-from core.impls.neo.mappers.neo_record_to_domain_mapper import NeoRecordToDomainMapper
+from core.impls.alchemy import tables
+from core.impls.alchemy.mappers.alchemy_to_domain_mapper import AlchemyToDomainMapper
 from core.models.educational_level import EducationalLevel
 from scraping.clients.lessons.lessons_client import LessonsClient
 from scraping.schemas.classroom import ClassroomSchema
@@ -22,7 +25,7 @@ class DummyLessonsClient(LessonsClient):
         size: int,
         session: AsyncSession,
         faker: Faker,
-        mapper: NeoRecordToDomainMapper,
+        mapper: AlchemyToDomainMapper,
     ) -> None:
         self.size: Final = size
         self._session = session
@@ -30,19 +33,15 @@ class DummyLessonsClient(LessonsClient):
         self._mapper = mapper
 
     async def get_all(self, level: EducationalLevel) -> Sequence[LessonSchema]:
-        stmt = """
-            match (group:Group)-[:BELONGS_TO]-(educational_level:EducationalLevel)
-                where educational_level.id = $level.id
-            return group, educational_level;
-        """
-        result = await self._session.run(
-            stmt,
-            parameters={"level": level.model_dump(mode="json")},
+        stmt = (
+            select(tables.Group)
+            .where(tables.Group.level_id == str(level.id))
+            .options(joinedload(tables.Group.level))
         )
-        record = await result.single()
-        if record is None:
+        group_model = await self._session.scalar(stmt)
+        if group_model is None:
             return []
-        group = self._mapper.map_group(record.data())
+        group = self._mapper.map_group(group_model)
         return [
             LessonSchema(
                 group=GroupWithoutCodeSchema(title=group.title),

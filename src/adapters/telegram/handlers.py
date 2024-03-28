@@ -5,7 +5,7 @@ from typing import Annotated, assert_never
 from aiogram import Bot, Dispatcher, F
 from aiogram.filters import Command, CommandStart, or_f
 from aiogram.fsm.context import FSMContext
-from aiogram.types import CallbackQuery, Message
+from aiogram.types import CallbackQuery, InaccessibleMessage, Message
 from aiogram.utils.keyboard import InlineKeyboardBuilder, ReplyKeyboardBuilder
 from aioinject import Inject, inject
 
@@ -20,11 +20,11 @@ from core.domain.group.queries.get_by_educational_level import (
     GetGroupsByEducationalLevelQuery,
 )
 from core.domain.lesson.dtos import GetLessonsReportDto
-from core.domain.lesson.query.lessons_report import LessonsReportQuery
+from core.domain.lesson.queries.lessons_report import LessonsReportQuery
+from core.domain.lesson.report_renderer import ReportRenderer
 from core.domain.user.commands.set_selected_group import SetSelectedGroupCommand
 from core.domain.user.dtos import SetSelectedGroupDto
 from core.errors import EntityNotFoundError, Never
-from core.internal.report_renderer import ReportRenderer
 from core.models.group import GroupId
 from core.models.user import User
 from lib.dates import utc_now
@@ -145,6 +145,10 @@ async def handle_educational_level_selection(
     builder.adjust(2)
     if callback.message is None:
         raise Never
+
+    if isinstance(callback.message, InaccessibleMessage):
+        return
+
     await callback.message.answer(
         "Выберите одну из групп",
         reply_markup=builder.as_markup(),

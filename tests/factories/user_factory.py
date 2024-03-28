@@ -1,12 +1,16 @@
-import uuid
-
 import factory
 
-from core.models import User, UserPreferences
+from core import models
+from core.impls.alchemy.tables.user import User, UserPreferences
 from tests.factories.base import GenericFactory
 
 
 class UserFactory(GenericFactory[User]):
-    id = factory.LazyFunction(uuid.uuid4)
+    id = factory.Faker("uuid4")
     telegram_id = factory.Faker("pyint")
-    preferences = factory.LazyAttribute(lambda _: UserPreferences.empty())
+
+
+class UserPreferencesFactory(GenericFactory[UserPreferences]):
+    report_days_offset = factory.LazyFunction(
+        lambda: models.UserPreferences.empty().report_days_offset,
+    )

@@ -5,5 +5,4 @@ from core.models import EducationalLevel
 
 
 class GetAllEducationalLevelsQuery(Protocol):
-    async def execute(self) -> Sequence[EducationalLevel]:
-        ...
+    async def execute(self) -> Sequence[EducationalLevel]: ...

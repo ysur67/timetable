@@ -1,5 +1,3 @@
-from typing import final
-
 from neo4j import AsyncSession
 
 from core.domain.subject.repositories import SubjectRepository
@@ -7,7 +5,6 @@ from core.impls.neo.mappers.neo_record_to_domain_mapper import NeoRecordToDomain
 from core.models import Subject
 
 
-@final
 class NeoSubjectRepository(SubjectRepository):
     def __init__(
         self,
