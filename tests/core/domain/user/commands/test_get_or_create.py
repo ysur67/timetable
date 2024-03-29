@@ -1,4 +1,4 @@
-import sys
+import uuid
 
 import pytest
 from sqlalchemy import select
@@ -16,7 +16,7 @@ async def test_command_will_create_new_user_if_there_is_no_such_telegram_id(
     get_or_create_user_command: GetOrCreateUserCommand,
     session: AsyncSession,
 ) -> None:
-    dto = GetOrCreateUserDto(telegram_id=sys.maxsize)
+    dto = GetOrCreateUserDto(telegram_id=UserTelegramId(str(uuid.uuid4())))
     exists, _ = await _get_user_exists(session, dto.telegram_id)
     assert exists is False
     await get_or_create_user_command.execute(dto)

@@ -1,3 +1,4 @@
+import uuid
 from datetime import UTC, date, datetime
 
 import factory
@@ -8,7 +9,7 @@ from tests.factories.base import GenericFactory
 
 
 class LessonFactory(GenericFactory[Lesson]):
-    id = factory.Faker("uuid4")
+    id = factory.LazyFunction(lambda: uuid.uuid4())
     date_ = FuzzyDate(start_date=date.min)
     time_start = factory.LazyAttribute(
         lambda _: FuzzyDateTime(start_dt=datetime(1970, 1, 1, tzinfo=UTC))
