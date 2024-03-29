@@ -7,7 +7,7 @@ from aiogram.types import CallbackQuery, Message
 from aioinject import inject
 
 
-class AioinjectMiddlware(BaseMiddleware):
+class AioinjectMiddleware(BaseMiddleware):
 
     def __init__(self, container: aioinject.Container) -> None:
         super().__init__()

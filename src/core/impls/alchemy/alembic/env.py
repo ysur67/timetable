@@ -9,7 +9,7 @@ from sqlalchemy.ext.asyncio import AsyncEngine
 import core.impls.alchemy.tables  # noqa: F401
 from core.impls.alchemy.base import Base
 from lib.settings import get_settings
-from lib.settings.database import SqliteSettings
+from lib.settings.database import PostgresSettings
 
 config = context.config
 
@@ -17,7 +17,7 @@ if config.config_file_name is not None:
     fileConfig(config.config_file_name)
 
 if not config.get_main_option("sqlalchemy.url"):
-    config.set_main_option("sqlalchemy.url", get_settings(SqliteSettings).url)
+    config.set_main_option("sqlalchemy.url", get_settings(PostgresSettings).url)
 
 target_metadata = Base.metadata
 

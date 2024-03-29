@@ -1,5 +1,3 @@
-import uuid
-
 from core.impls.alchemy import tables
 from core.models.classroom import Classroom
 from core.models.educational_level import EducationalLevel
@@ -12,11 +10,11 @@ from core.models.user import User, UserId, UserPreferences, UserTelegramId
 
 class AlchemyToDomainMapper:
     def map_classroom(self, table: tables.Classroom) -> Classroom:
-        return Classroom.model_validate(table)
+        return Classroom(id=table.id, title=table.title)
 
     def map_group(self, table: tables.Group) -> Group:
         return Group(
-            id=GroupId(uuid.UUID(table.id)),
+            id=GroupId(table.id),
             external_id=GroupExternalId(table.code),
             title=table.title,
             level=self.map_educational_level(table.level),
@@ -24,7 +22,7 @@ class AlchemyToDomainMapper:
 
     def map_simple_group(self, table: tables.Group) -> SimpleGroup:
         return SimpleGroup(
-            id=GroupId(uuid.UUID(table.id)),
+            id=GroupId(table.id),
             external_id=GroupExternalId(table.code),
             title=table.title,
         )
@@ -40,8 +38,8 @@ class AlchemyToDomainMapper:
 
     def map_user(self, table: tables.User) -> User:
         return User(
-            id=UserId(uuid.UUID(table.id)),
-            telegram_id=UserTelegramId(int(table.telegram_id)),
+            id=UserId(table.id),
+            telegram_id=UserTelegramId(table.telegram_id),
             preferences=self._map_user_preferences(table),
         )
 
@@ -67,7 +65,7 @@ class AlchemyToDomainMapper:
         if table.teacher is not None:
             teacher = self.map_teacher(table.teacher)
         return Lesson(
-            id=LessonId(uuid.UUID(table.id)),
+            id=LessonId(table.id),
             date_=table.date_,
             time_start=table.time_start,
             time_end=table.time_end,

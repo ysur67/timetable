@@ -1,3 +1,5 @@
+import uuid
+
 import factory
 
 from core import models
@@ -6,8 +8,8 @@ from tests.factories.base import GenericFactory
 
 
 class UserFactory(GenericFactory[User]):
-    id = factory.Faker("uuid4")
-    telegram_id = factory.Faker("pyint")
+    id = factory.LazyFunction(lambda: uuid.uuid4())
+    telegram_id = factory.LazyFunction(lambda: str(uuid.uuid4()))
 
 
 class UserPreferencesFactory(GenericFactory[UserPreferences]):

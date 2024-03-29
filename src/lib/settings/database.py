@@ -28,3 +28,20 @@ class SqliteSettings(BaseSettings):
     @property
     def url(self) -> str:
         return f"{self.driver}:///{self.filename}"
+
+
+class PostgresSettings(BaseSettings):
+    model_config = SettingsConfigDict(env_prefix="database_")
+
+    driver: str = "postgresql+asyncpg"
+
+    host: str
+    port: str
+    name: str
+    user: str
+    password: str
+    echo: bool = False
+
+    @property
+    def url(self) -> str:
+        return f"{self.driver}://{self.user}:{self.password}@{self.host}:{self.port}/{self.name}"

@@ -7,7 +7,7 @@ if TYPE_CHECKING:
     from core.models import Group
 
 
-UserTelegramId = NewType("UserTelegramId", int)
+UserTelegramId = NewType("UserTelegramId", str)
 UserId = NewType("UserId", uuid.UUID)
 
 

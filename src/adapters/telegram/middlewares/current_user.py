@@ -18,7 +18,7 @@ class ChatCurrentUserMiddleware(BaseMiddleware):
         data: dict[str, Any],
         command: Annotated[GetOrCreateUserCommand, Inject],
     ) -> Any:  # noqa: ANN401
-        user = await command.execute(GetOrCreateUserDto(telegram_id=event.chat.id))
+        user = await command.execute(GetOrCreateUserDto(telegram_id=str(event.chat.id)))
         data["user"] = user
         return await handler(event, data)
 
@@ -35,7 +35,7 @@ class CallbackCurrentUserMiddleware(BaseMiddleware):
         if event.message is None:
             raise NotImplementedError
         user = await command.execute(
-            GetOrCreateUserDto(telegram_id=event.message.chat.id),
+            GetOrCreateUserDto(telegram_id=str(event.message.chat.id)),
         )
         data["user"] = user
         return await handler(event, data)
