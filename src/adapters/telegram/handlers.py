@@ -11,7 +11,7 @@ from aioinject import Inject, inject
 from result import Err
 
 from adapters.telegram.middlewares.aioinject_ import (
-    AioinjectMiddlware,
+    AioinjectMiddleware,
     CallbackAioinjectMiddleware,
 )
 from adapters.telegram.middlewares.current_user import (
@@ -36,7 +36,7 @@ from di import create_container
 from lib.dates import utc_now
 
 dispatcher = Dispatcher()
-dispatcher.message.middleware(AioinjectMiddlware(container=create_container()))
+dispatcher.message.middleware(AioinjectMiddleware(container=create_container()))
 dispatcher.callback_query.middleware(
     CallbackAioinjectMiddleware(container=create_container()),
 )
@@ -163,6 +163,8 @@ async def handle_educational_level_selection(
         "Выберите одну из групп",
         reply_markup=builder.as_markup(),
     )
+    if isinstance(callback.message, Message):
+        await callback.message.delete()
 
 
 @dispatcher.callback_query(GroupSelectionState.group_selection)
@@ -193,3 +195,5 @@ async def handle_group_selection(
     group = result.ok_value
     await state.clear()
     await callback.answer(f"Группа {group.title} успешно выбрана")
+    if isinstance(callback.message, Message):
+        await callback.message.delete()
