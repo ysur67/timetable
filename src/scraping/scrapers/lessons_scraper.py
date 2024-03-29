@@ -11,7 +11,6 @@ from core.models import (
     ClassroomId,
     Lesson,
     LessonId,
-    Model,
     Subject,
     SubjectId,
     Teacher,
@@ -56,11 +55,8 @@ class LessonsScraper:
                     continue
                 self._logger.info("Processing %s", schema)
                 classroom = await self._get_classroom(schema)
-                self._log_object(Classroom, classroom)
                 subject = await self._get_subject(schema)
-                self._log_object(Subject, subject)
                 teacher = await self._get_teacher(schema)
-                self._log_object(Teacher, classroom)
                 lesson = Lesson(
                     id=LessonId(uuid.uuid4()),
                     date_=schema.date_,
@@ -73,49 +69,44 @@ class LessonsScraper:
                     classroom=classroom,
                     note=schema.note,
                 )
-                self._logger.info("Creating %s", lesson)
                 await self._lesson_repository.get_or_create(lesson)
+                self._logger.info("Found %s with id %s", Lesson.__name__, lesson.id)
 
     async def _get_teacher(self, schema: LessonSchema) -> Teacher | None:
         if schema.teacher is None:
             return None
-        return await self._teacher_repository.get_or_create(
+        result, is_created = await self._teacher_repository.get_or_create(
             Teacher(
                 id=TeacherId(uuid.uuid4()),
                 name=schema.teacher.name,
             ),
         )
+        operation = "Created" if is_created else "Found"
+        self._logger.info("%s %s with id %s", operation, Teacher.__name__, result.id)
+        return result
 
     async def _get_subject(self, schema: LessonSchema) -> Subject | None:
         if schema.subject is None:
             return None
-        return await self._subject_repository.get_or_create(
+        result, is_created = await self._subject_repository.get_or_create(
             Subject(
                 id=SubjectId(uuid.uuid4()),
                 title=schema.subject.title,
             ),
         )
+        operation = "Created" if is_created else "Found"
+        self._logger.info("%s %s with id %s", operation, Subject.__name__, result.id)
+        return result
 
     async def _get_classroom(self, schema: LessonSchema) -> Classroom | None:
         if schema.classroom is None:
             return None
-        return await self._classroom_repository.get_or_create(
+        result, is_created = await self._classroom_repository.get_or_create(
             Classroom(
                 id=ClassroomId(uuid.uuid4()),
                 title=schema.classroom.title,
             ),
         )
-
-    def _log_object(
-        self,
-        klass: type[Model],
-        model: Model | None = None,
-    ) -> None:
-        if model is None:
-            self._logger.info("Couldn't find %s", klass.__name__)
-            return
-        self._logger.info(
-            "Found %s %s",
-            klass.__name__,
-            model,
-        )
+        operation = "Created" if is_created else "Found"
+        self._logger.info("%s %s with id %s", operation, Classroom.__name__, result.id)
+        return result

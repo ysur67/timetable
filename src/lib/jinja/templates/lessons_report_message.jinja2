@@ -3,8 +3,8 @@
 Дата: {{ lesson.date_ }}
 Начало: {{ lesson.time_start }}
 Конец: {{ lesson.time_end }}
-{% if lesson.subject %}Предмет: {{ lesson.subject.title }}{% endif %}
-{% if lesson.teacher %}Преподаватель: {{ lesson.teacher.name }}{% endif %}
-{% if lesson.href %}Ссылка: lesson.href{% endif %}
-{% if lesson.note %}Примечание: {{ lesson.note }}{% endif %}
+Предмет: {% if lesson.subject %}{{ lesson.subject.title }}{% else %} {% endif %}
+Преподаватель: {% if lesson.teacher %}{{ lesson.teacher.name }}{% else %} {% endif %}
+Ссылка: {% if lesson.href %}{{lesson.href}}{% else %} {% endif %}
+Примечание: {% if lesson.note %}{{ lesson.note }}{% else %} {% endif %}
 {% endfor %}

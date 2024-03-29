@@ -38,8 +38,11 @@ class AlchemyClassroomRepository(ClassroomRepository):
         await self._session.flush()
         return classroom
 
-    async def get_or_create(self, classroom: models.Classroom) -> models.Classroom:
+    async def get_or_create(
+        self,
+        classroom: models.Classroom,
+    ) -> tuple[models.Classroom, bool]:
         model = await self.get_by_title(classroom.title)
         if model is not None:
-            return model
-        return await self.create(classroom)
+            return model, False
+        return await self.create(classroom), True

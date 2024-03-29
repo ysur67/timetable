@@ -37,8 +37,11 @@ class AlchemySubjectRepository(SubjectRepository):
         await self._session.flush()
         return subject
 
-    async def get_or_create(self, subject: models.Subject) -> models.Subject:
+    async def get_or_create(
+        self,
+        subject: models.Subject,
+    ) -> tuple[models.Subject, bool]:
         model = await self.get_by_title(subject.title)
         if model is not None:
-            return model
-        return await self.create(subject)
+            return model, False
+        return await self.create(subject), True
