@@ -4,6 +4,9 @@ from core.domain.classroom.repositories import ClassroomRepository
 from core.domain.educational_level.repositories import EducationalLevelRepository
 from core.domain.group.repositories import GroupRepository
 from core.domain.lesson.repository import LessonRepository
+from core.domain.notifications.commands.send_lessons_created_notification import (
+    SendLessonsCreatedNotificationCommand,
+)
 from core.domain.subject.repositories import SubjectRepository
 from core.domain.teacher.repositories import TeacherRepository
 from core.models import (
@@ -31,6 +34,7 @@ class LessonsScraper:
         subject_repository: SubjectRepository,
         classroom_repository: ClassroomRepository,
         lesson_repository: LessonRepository,
+        send_notifications_command: SendLessonsCreatedNotificationCommand,
     ) -> None:
         self._client = lessons_client
         self._educational_level_repo = educational_level_repository
@@ -39,38 +43,53 @@ class LessonsScraper:
         self._subject_repository = subject_repository
         self._classroom_repository = classroom_repository
         self._lesson_repository = lesson_repository
+        self._send_notifications_command = send_notifications_command
         self._logger = get_default_logger(self.__class__.__name__)
 
     async def scrape(self) -> None:
+        created_lessons: list[Lesson] = []
         for level in await self._educational_level_repo.get_all():
             lessons = await self._client.get_all(level)
             for schema in lessons:
-                group = await self._group_repository.get_by_title(schema.group.title)
-                if group is None:
-                    self._logger.error(
-                        "Couldn't find group by title %s. Skipping %s creation...",
-                        schema.group.title,
-                        Lesson.__name__,
-                    )
+                result = await self._scrape_lesson(schema)
+                if result is None:
                     continue
-                self._logger.info("Processing %s", schema)
-                classroom = await self._get_classroom(schema)
-                subject = await self._get_subject(schema)
-                teacher = await self._get_teacher(schema)
-                lesson = Lesson(
-                    id=LessonId(uuid.uuid4()),
-                    date_=schema.date_,
-                    time_start=schema.starts_at,
-                    time_end=schema.ends_at,
-                    group=group,
-                    teacher=teacher,
-                    subject=subject,
-                    link=schema.href,
-                    classroom=classroom,
-                    note=schema.note,
-                )
-                await self._lesson_repository.get_or_create(lesson)
-                self._logger.info("Found %s with id %s", Lesson.__name__, lesson.id)
+                lesson, is_created = result
+                if not is_created:
+                    continue
+                created_lessons.append(lesson)
+        if not created_lessons:
+            return
+        await self._send_notifications_command.execute(created_lessons)
+
+    async def _scrape_lesson(self, schema: LessonSchema) -> tuple[Lesson, bool] | None:
+        group = await self._group_repository.get_by_title(schema.group.title)
+        if group is None:
+            self._logger.error(
+                "Couldn't find group by title %s. Skipping %s creation...",
+                schema.group.title,
+                Lesson.__name__,
+            )
+            return None
+        self._logger.info("Processing %s", schema)
+        classroom = await self._get_classroom(schema)
+        subject = await self._get_subject(schema)
+        teacher = await self._get_teacher(schema)
+        lesson = Lesson(
+            id=LessonId(uuid.uuid4()),
+            date_=schema.date_,
+            time_start=schema.starts_at,
+            time_end=schema.ends_at,
+            group=group,
+            teacher=teacher,
+            subject=subject,
+            link=schema.href,
+            classroom=classroom,
+            note=schema.note,
+        )
+        creation_result = await self._lesson_repository.get_or_create(lesson)
+        self._logger.info("Found %s with id %s", Lesson.__name__, lesson.id)
+        return creation_result
 
     async def _get_teacher(self, schema: LessonSchema) -> Teacher | None:
         if schema.teacher is None:

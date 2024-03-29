@@ -6,6 +6,9 @@ from core.domain.classroom.repositories import ClassroomRepository
 from core.domain.educational_level.repositories import EducationalLevelRepository
 from core.domain.group.repositories import GroupRepository
 from core.domain.lesson.repository import LessonRepository
+from core.domain.notifications.commands.send_lessons_created_notification import (
+    SendLessonsCreatedNotificationCommand,
+)
 from core.domain.subject.repositories import SubjectRepository
 from core.domain.teacher.repositories import TeacherRepository
 from core.impls.alchemy.mappers.alchemy_to_domain_mapper import AlchemyToDomainMapper
@@ -67,6 +70,7 @@ def lessons_scraper(  # noqa: PLR0913
     subject_repository: SubjectRepository,
     classroom_repository: ClassroomRepository,
     lesson_repository: LessonRepository,
+    send_lessons_created_notification_command: SendLessonsCreatedNotificationCommand,
 ) -> LessonsScraper:
     return LessonsScraper(
         lessons_client,
@@ -76,4 +80,5 @@ def lessons_scraper(  # noqa: PLR0913
         subject_repository,
         classroom_repository,
         lesson_repository,
+        send_lessons_created_notification_command,
     )

@@ -1,0 +1,7 @@
+Для вашей группы <b>{{ group.title }}</b>
+Только что нашлись новые занятия:
+
+{% for lesson in created_lessons %}
+{% include 'lesson_list_item.jinja2' %}
+{% endfor %}
+

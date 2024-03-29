@@ -1,5 +1,3 @@
-from typing import final
-
 from neo4j import AsyncSession
 
 from core.domain.user.repositories import UserRepository
@@ -8,7 +6,6 @@ from core.models.group import Group
 from core.models.user import User, UserTelegramId
 
 
-@final
 class NeoUserRepository(UserRepository):
     def __init__(self, session: AsyncSession, mapper: NeoRecordToDomainMapper) -> None:
         self._session = session
