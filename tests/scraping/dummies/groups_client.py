@@ -16,7 +16,4 @@ class DummyGroupsClient(GroupsClient):
         self,
         level: EducationalLevelSchema,  # noqa: ARG002
     ) -> Sequence[GroupSchema]:
-        return [
-            GroupSchema(title=str(uuid.uuid4()), code=str(index))
-            for index in range(self.size)
-        ]
+        return [GroupSchema(title=str(uuid.uuid4()), code=str(index)) for index in range(self.size)]

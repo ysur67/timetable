@@ -34,9 +34,7 @@ class DummyLessonsClient(LessonsClient):
 
     async def get_all(self, level: EducationalLevel) -> Sequence[LessonSchema]:
         stmt = (
-            select(tables.Group)
-            .where(tables.Group.level_id == str(level.id))
-            .options(joinedload(tables.Group.level))
+            select(tables.Group).where(tables.Group.level_id == str(level.id)).options(joinedload(tables.Group.level))
         )
         group_model = await self._session.scalar(stmt)
         if group_model is None:

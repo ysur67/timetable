@@ -16,7 +16,7 @@ class DomainToAlchemyMapper:
         return tables.Group(
             id=domain.id,
             title=domain.title,
-            level_id=domain.level.id,
+            level_id=domain.level_id,
             code=domain.external_id,
         )
 

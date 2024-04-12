@@ -5,6 +5,7 @@ from dataclasses import dataclass
 from core.domain.educational_level.repositories import EducationalLevelRepository
 from core.domain.group.repositories import GroupRepository
 from core.models import EducationalLevel, Group, GroupId
+from core.models.educational_level import EducationalLevelId
 from lib.logger import get_default_logger
 from scraping.clients.groups.groups_client import GroupsClient
 from scraping.schemas.educational_level import EducationalLevelSchema
@@ -14,7 +15,7 @@ from scraping.schemas.group import GroupSchema
 @dataclass(frozen=True)
 class _GroupKey:
     title: str
-    level: EducationalLevel
+    level_id: EducationalLevelId
 
 
 @dataclass
@@ -45,7 +46,7 @@ class GroupsScraper:
                 Group(
                     id=GroupId(uuid.uuid4()),
                     title=schema.title,
-                    level=key.level,
+                    level_id=key.level_id,
                     external_id=schema.code,
                 )
                 for key, schema in response.to_create.items()
@@ -58,7 +59,7 @@ class GroupsScraper:
     ) -> _ExtractGroupsResponse:
         groups = await self._group_repo.get_all()
         existing: dict[_GroupKey, GroupSchema] = {
-            _GroupKey(title=group.title, level=group.level): GroupSchema(
+            _GroupKey(title=group.title, level_id=group.level_id): GroupSchema(
                 title=group.title,
                 code=group.external_id,
             )
@@ -79,7 +80,7 @@ class GroupsScraper:
             )
             self._logger.info("Found %d groups", len(found_groups))
             for group in found_groups:
-                key = _GroupKey(title=group.title, level=level)
+                key = _GroupKey(title=group.title, level_id=level.id)
                 if (existing.get(key)) is None:
                     self._logger.info(
                         "Found new %s: %s",
