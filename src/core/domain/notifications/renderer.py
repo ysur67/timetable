@@ -2,14 +2,14 @@ from typing import Protocol, final
 
 from jinja2 import Environment
 
-from core.models import Lesson, SimpleGroup
+from core.models import Group, Lesson
 
 
 class LessonsCreatedNotificationRenderer(Protocol):
     async def render(
         self,
         *,
-        group: SimpleGroup,
+        group: Group,
         created_lessons: list[Lesson],
     ) -> str: ...
 
@@ -22,7 +22,7 @@ class JinjaLessonsCreatedNotificationsRenderer(LessonsCreatedNotificationRendere
     async def render(
         self,
         *,
-        group: SimpleGroup,
+        group: Group,
         created_lessons: list[Lesson],
     ) -> str:
         template = self._env.get_template("lessons_created_notification.jinja2")
@@ -34,5 +34,5 @@ class JinjaLessonsCreatedNotificationsRenderer(LessonsCreatedNotificationRendere
 
 @final
 class DummyLessonsCreatedNotificationsRenderer(LessonsCreatedNotificationRenderer):
-    async def render(self, *, group: SimpleGroup, created_lessons: list[Lesson]) -> str:
+    async def render(self, *, group: Group, created_lessons: list[Lesson]) -> str:
         return group.title + " ".join([str(lesson.id) for lesson in created_lessons])

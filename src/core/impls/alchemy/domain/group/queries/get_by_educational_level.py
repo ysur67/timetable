@@ -28,10 +28,6 @@ class AlchemyGetGroupsByEducationalLevelQuery(GetGroupsByEducationalLevelQuery):
         self,
         dto: GetGroupsByEducationalLevelDto,
     ) -> Sequence[models.Group]:
-        stmt = (
-            select(Group)
-            .where(Group.level_id == str(dto.level_id))
-            .options(joinedload(Group.level))
-        )
+        stmt = select(Group).where(Group.level_id == str(dto.level_id)).options(joinedload(Group.level))
         result = await self._session.scalars(stmt)
         return [self._to_domain.map_group(group) for group in result.all()]

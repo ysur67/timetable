@@ -15,11 +15,7 @@ class LessonsFilter(BaseModel):
 
     @property
     def has_any_value(self) -> bool:
-        return (
-            self.start_date is not None
-            or self.end_date is not None
-            or self.group_id is not None
-        )
+        return self.start_date is not None or self.end_date is not None or self.group_id is not None
 
     @classmethod
     def empty(cls) -> "LessonsFilter":

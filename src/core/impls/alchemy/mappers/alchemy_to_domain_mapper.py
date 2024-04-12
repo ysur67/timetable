@@ -1,7 +1,7 @@
 from core.impls.alchemy import tables
 from core.models.classroom import Classroom
-from core.models.educational_level import EducationalLevel
-from core.models.group import Group, GroupExternalId, GroupId, SimpleGroup
+from core.models.educational_level import EducationalLevel, EducationalLevelId
+from core.models.group import Group, GroupExternalId, GroupId
 from core.models.lesson import Lesson, LessonId
 from core.models.subject import Subject
 from core.models.teacher import Teacher
@@ -17,14 +17,15 @@ class AlchemyToDomainMapper:
             id=GroupId(table.id),
             external_id=GroupExternalId(table.code),
             title=table.title,
-            level=self.map_educational_level(table.level),
+            level_id=EducationalLevelId(table.level_id),
         )
 
-    def map_simple_group(self, table: tables.Group) -> SimpleGroup:
-        return SimpleGroup(
+    def map_simple_group(self, table: tables.Group) -> Group:
+        return Group(
             id=GroupId(table.id),
             external_id=GroupExternalId(table.code),
             title=table.title,
+            level_id=EducationalLevelId(table.level_id),
         )
 
     def map_subject(self, table: tables.Subject) -> Subject:

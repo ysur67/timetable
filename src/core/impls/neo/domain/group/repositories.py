@@ -6,7 +6,7 @@ from neo4j import AsyncSession
 
 from core.domain.group.repositories import GroupRepository
 from core.impls.neo.mappers.neo_record_to_domain_mapper import NeoRecordToDomainMapper
-from core.models import EducationalLevel, Group
+from core.models import Group
 from core.models.educational_level import EducationalLevelId
 from core.models.group import GroupId
 
@@ -36,11 +36,11 @@ class NeoGroupRepository(GroupRepository):
         self,
         groups: Iterable[Group],
     ) -> Iterable[Group]:
-        groups_by_level: dict[EducationalLevel, list[Group]]
+        groups_by_level: dict[EducationalLevelId, list[Group]]
         groups_by_level = collections.defaultdict(list)
         for group in groups:
-            groups_by_level[group.level].append(group)
-        for level, related_groups in groups_by_level.items():
+            groups_by_level[group.level_id].append(group)
+        for level_id, related_groups in groups_by_level.items():
             stmt = """
                 MATCH (e:EducationalLevel)
                     WHERE e.id = $level_id
@@ -57,10 +57,8 @@ class NeoGroupRepository(GroupRepository):
             await self._session.run(
                 stmt,
                 parameters={
-                    "level_id": str(level.id),
-                    "groups": [
-                        group.model_dump(mode="json") for group in related_groups
-                    ],
+                    "level_id": str(level_id),
+                    "groups": [group.model_dump(mode="json") for group in related_groups],
                 },
             )
         return groups

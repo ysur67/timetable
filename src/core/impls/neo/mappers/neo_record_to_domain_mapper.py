@@ -9,6 +9,7 @@ from core.models import (
     Teacher,
     User,
 )
+from core.models.educational_level import EducationalLevelId
 from core.models.user import UserPreferences
 
 
@@ -30,7 +31,7 @@ class NeoRecordToDomainMapper:
             id=data["id"],
             title=data["title"],
             external_id=data["code"],
-            level=self.map_educational_level(record),
+            level_id=EducationalLevelId(data["educational_level"]["id"]),
         )
 
     def map_educational_level(self, record: dict[str, Any]) -> EducationalLevel:

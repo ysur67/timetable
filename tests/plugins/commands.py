@@ -38,9 +38,7 @@ async def lessons_created_renderer() -> LessonsCreatedNotificationRenderer:
 
 
 @pytest.fixture()
-async def lessons_created_notification_sender() -> (
-    DummyLessonsCreatedNotificationSender
-):
+async def lessons_created_notification_sender() -> DummyLessonsCreatedNotificationSender:
     return DummyLessonsCreatedNotificationSender()
 
 

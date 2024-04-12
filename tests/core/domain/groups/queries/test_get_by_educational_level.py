@@ -28,4 +28,4 @@ async def test_returns_actual_group_if_such_group_belongs_to_educational_level(
         GetGroupsByEducationalLevelDto(level_id=educational_level.id),
     )
     assert len(result) == 1
-    assert result[0].level.id == educational_level.id
+    assert result[0].level_id == educational_level.id

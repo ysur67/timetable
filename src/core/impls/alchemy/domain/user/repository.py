@@ -32,9 +32,7 @@ class AlchemyUserRepository(UserRepository):
             select(User)
             .where(User.telegram_id == ident)
             .options(
-                joinedload(User.preferences)
-                .joinedload(UserPreferences.selected_group)
-                .joinedload(Group.level),
+                joinedload(User.preferences).joinedload(UserPreferences.selected_group).joinedload(Group.level),
             )
         )
         model = await self._session.scalar(stmt)
@@ -72,9 +70,7 @@ class AlchemyUserRepository(UserRepository):
             select(User)
             .join(User.preferences)
             .options(
-                joinedload(User.preferences)
-                .joinedload(UserPreferences.selected_group)
-                .joinedload(Group.level),
+                joinedload(User.preferences).joinedload(UserPreferences.selected_group).joinedload(Group.level),
             )
         )
         if filter_.selected_group_id is not Unset:

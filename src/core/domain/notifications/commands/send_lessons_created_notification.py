@@ -2,7 +2,7 @@ import collections
 
 from core.domain.notifications.renderer import LessonsCreatedNotificationRenderer
 from core.domain.notifications.sender import LessonsCreatedNotificationSender
-from core.models import Lesson, SimpleGroup
+from core.models import Group, Lesson
 
 
 class SendLessonsCreatedNotificationCommand:
@@ -18,7 +18,7 @@ class SendLessonsCreatedNotificationCommand:
         if not created_lessons:
             return
 
-        lessons_by_group: dict[SimpleGroup, list[Lesson]] = collections.defaultdict(
+        lessons_by_group: dict[Group, list[Lesson]] = collections.defaultdict(
             list,
         )
         for lesson in created_lessons:
