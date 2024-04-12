@@ -17,6 +17,7 @@ class SendLessonsCreatedNotificationCommand:
     async def execute(self, created_lessons: list[Lesson]) -> None:
         if not created_lessons:
             return
+
         lessons_by_group: dict[SimpleGroup, list[Lesson]] = collections.defaultdict(
             list,
         )

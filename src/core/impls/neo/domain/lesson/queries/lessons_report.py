@@ -14,7 +14,7 @@ class NeoLessonsReportQuery(LessonsReportQuery):
     async def execute(self, dto: GetLessonsReportDto) -> LessonsReport:
         lessons = await self._repo.get_lessons(
             LessonsFilter(
-                group=dto.group,
+                group_id=dto.group,
                 start_date=dto.start_date,
                 end_date=dto.end_date,
             ),
