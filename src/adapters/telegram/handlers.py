@@ -49,15 +49,10 @@ dispatcher.callback_query.middleware(CallbackCurrentUserMiddleware())
 async def handle_command_start(
     message: Message,
     bot: Annotated[Bot, Inject],
-    user: User,
 ) -> None:
     builder = ReplyKeyboardBuilder()
     builder.button(text="Показать расписание")
-    select_group_title = "Выбрать группу"
-    if (group := user.preferences.selected_group) is not None:
-        select_group_title = f"Выбрать группу ({group.title})"
-    builder.button(text=select_group_title)
-    builder.button(text="Настройки")
+    builder.button(text="Выбрать группу")
     builder.adjust(1)
     await bot.send_message(
         message.chat.id,
@@ -81,10 +76,7 @@ async def handle_get_schedule(
     user: User,
 ) -> None:
     if user.preferences.selected_group is None:
-        await bot.send_message(
-            message.chat.id,
-            "Группа не выбрана",
-        )
+        await bot.send_message(message.chat.id, "Группа не выбрана")
         return
     current_date = utc_now().date()
     report = await query.execute(

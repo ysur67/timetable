@@ -4,7 +4,7 @@ from datetime import date, time
 from typing import TYPE_CHECKING, NewType
 
 if TYPE_CHECKING:
-    from core.models import Classroom, SimpleGroup, Subject, Teacher
+    from core.models import Classroom, Group, Subject, Teacher
 
 from core.models import Model
 
@@ -16,7 +16,7 @@ class Lesson(Model):
     date_: date
     time_start: time
     time_end: time
-    group: "SimpleGroup"
+    group: "Group"
     teacher: "Teacher | None" = None
     subject: "Subject | None" = None
     classroom: "Classroom | None" = None

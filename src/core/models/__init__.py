@@ -1,7 +1,7 @@
 from .base import Model
 from .classroom import Classroom, ClassroomId
 from .educational_level import EducationalLevel, EducationalLevelId
-from .group import Group, GroupExternalId, GroupId, SimpleGroup
+from .group import Group, GroupExternalId, GroupId
 from .lesson import Lesson, LessonId
 from .lessons_report import LessonsReport
 from .subject import Subject, SubjectId
@@ -17,7 +17,6 @@ __all__ = [
     "Model",
     "EducationalLevel",
     "EducationalLevelId",
-    "SimpleGroup",
     "Group",
     "GroupId",
     "GroupExternalId",

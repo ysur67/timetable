@@ -12,14 +12,10 @@ class LessonFactory(GenericFactory[Lesson]):
     id = factory.LazyFunction(lambda: uuid.uuid4())
     date_ = FuzzyDate(start_date=date.min)
     time_start = factory.LazyAttribute(
-        lambda _: FuzzyDateTime(start_dt=datetime(1970, 1, 1, tzinfo=UTC))
-        .fuzz()
-        .time(),
+        lambda _: FuzzyDateTime(start_dt=datetime(1970, 1, 1, tzinfo=UTC)).fuzz().time(),
     )
     time_end = factory.LazyAttribute(
-        lambda _: FuzzyDateTime(start_dt=datetime(1970, 1, 1, tzinfo=UTC))
-        .fuzz()
-        .time(),
+        lambda _: FuzzyDateTime(start_dt=datetime(1970, 1, 1, tzinfo=UTC)).fuzz().time(),
     )
     link = factory.Faker("pystr")
     note = factory.Faker("pystr")

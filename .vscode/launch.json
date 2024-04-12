@@ -23,6 +23,13 @@
             "program": "${workspaceFolder}/src/adapters/telegram/main.py",
             "console": "integratedTerminal",
             "justMyCode": true
+        },
+        {
+          "name": "Run tests",
+          "type": "python",
+          "request": "launch",
+          "module": "pytest",
+          "args": ["."]
         }
     ]
 }

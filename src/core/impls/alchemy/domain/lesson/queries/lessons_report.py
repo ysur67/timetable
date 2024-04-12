@@ -38,9 +38,7 @@ class AlchemyLessonsReportQuery(LessonsReportQuery):
         )
         result = await self._session.scalars(stmt)
         return models.LessonsReport(
-            lessons=[
-                self._to_domain_mapper.map_lesson(lesson) for lesson in result.all()
-            ],
+            lessons=[self._to_domain_mapper.map_lesson(lesson) for lesson in result.all()],
             group=dto.group,
             date_start=dto.start_date,
             date_end=dto.end_date,

@@ -134,7 +134,7 @@ class NeoLessonRepository(LessonRepository):
             )
         if filter_.end_date is not None:
             filter_clauses.append("datetime(lesson.date) < datetime($filter.end_date)")
-        if filter_.group is not None:
+        if filter_.group_id is not None:
             filter_clauses.append("group.id = $filter.group.id")
         clause = "where " + " and ".join(filter_clauses)
         stmt = stmt.format(where_clause=clause)

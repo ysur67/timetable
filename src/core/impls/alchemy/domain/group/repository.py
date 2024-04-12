@@ -34,11 +34,7 @@ class AlchemyGroupRepository(GroupRepository):
         self,
         level_id: EducationalLevelId,
     ) -> Sequence[models.Group]:
-        stmt = (
-            select(Group)
-            .where(Group.level_id == level_id)
-            .options(joinedload(Group.level))
-        )
+        stmt = select(Group).where(Group.level_id == level_id).options(joinedload(Group.level))
         result = await self._session.scalars(stmt)
         return [self._to_domain.map_group(group) for group in result.all()]
 
@@ -52,11 +48,7 @@ class AlchemyGroupRepository(GroupRepository):
         return groups
 
     async def get_by_title(self, title: str) -> models.Group | None:
-        stmt = (
-            select(Group)
-            .where(func.lower(Group.title) == title.lower())
-            .options(joinedload(Group.level))
-        )
+        stmt = select(Group).where(func.lower(Group.title) == title.lower()).options(joinedload(Group.level))
         model = await self._session.scalar(stmt)
         if model is None:
             return None

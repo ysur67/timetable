@@ -4,21 +4,18 @@ from typing import Protocol
 
 from pydantic import BaseModel
 
-from core.models import Group, Lesson
+from core.models import Lesson
+from core.models.group import GroupId
 
 
 class LessonsFilter(BaseModel):
     start_date: date | None = None
     end_date: date | None = None
-    group: Group | None = None
+    group_id: GroupId | None = None
 
     @property
     def has_any_value(self) -> bool:
-        return (
-            self.start_date is not None
-            or self.end_date is not None
-            or self.group is not None
-        )
+        return self.start_date is not None or self.end_date is not None or self.group_id is not None
 
     @classmethod
     def empty(cls) -> "LessonsFilter":

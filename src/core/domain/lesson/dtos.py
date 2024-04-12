@@ -1,10 +1,10 @@
 from datetime import date
 
 from core.dtos import BaseDto
-from core.models.group import SimpleGroup
+from core.models.group import Group
 
 
 class GetLessonsReportDto(BaseDto):
-    group: SimpleGroup
+    group: Group
     start_date: date
     end_date: date

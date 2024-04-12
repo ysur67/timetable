@@ -1,9 +1,4 @@
 {% include 'report_title.jinja2' %}
 {% for lesson in report.lessons %}
-<b>{% if lesson.subject %}{{ lesson.subject.title | trim }}{% else %}Неизвестный предмет{% endif %}</b>
-Дата: {{ lesson.date_ }}
-{{ lesson.time_start }} - {{ lesson.time_end }}{{ '\n'|safe }}
-{%- if lesson.teacher -%}Преподаватель: {{ lesson.teacher.name | trim }}{{ '\n'|safe }}{%- endif -%}
-{%- if lesson.href -%}Ссылка: {{ lesson.href | trim }}{{ '\n'|safe }}{%- endif -%}
-{%- if lesson.note -%}Примечание: {{ lesson.note | trim }}{{ '\n'|safe }}{%- endif -%}
+{% include 'lesson_list_item.jinja2' %}
 {% endfor %}

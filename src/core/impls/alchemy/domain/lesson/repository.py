@@ -64,8 +64,8 @@ class AlchemyLessonRepository(LessonRepository):
             stmt = stmt.where(Lesson.date_ > filter_.start_date)
         if filter_.end_date is not None:
             stmt = stmt.where(Lesson.date_ < filter_.end_date)
-        if filter_.group is not None:
-            stmt = stmt.where(Lesson.group_id == filter_.group.id)
+        if filter_.group_id is not None:
+            stmt = stmt.where(Lesson.group_id == filter_.group_id)
         return stmt
 
     async def get_or_create(self, lesson: models.Lesson) -> tuple[models.Lesson, bool]:

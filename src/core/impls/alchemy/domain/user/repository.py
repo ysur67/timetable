@@ -1,13 +1,16 @@
+from collections.abc import Sequence
+
 from sqlalchemy import select, update
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import joinedload
 
 from core import models
-from core.domain.user.repositories import UserRepository
+from core.domain.user.repositories import UserFilter, UserRepository
 from core.impls.alchemy.mappers.alchemy_to_domain_mapper import AlchemyToDomainMapper
 from core.impls.alchemy.mappers.domain_to_alchemy_mapper import DomainToAlchemyMapper
 from core.impls.alchemy.tables.group import Group
 from core.impls.alchemy.tables.user import User, UserPreferences
+from lib.filter_ import Unset
 
 
 class AlchemyUserRepository(UserRepository):
@@ -29,9 +32,7 @@ class AlchemyUserRepository(UserRepository):
             select(User)
             .where(User.telegram_id == ident)
             .options(
-                joinedload(User.preferences)
-                .joinedload(UserPreferences.selected_group)
-                .joinedload(Group.level),
+                joinedload(User.preferences).joinedload(UserPreferences.selected_group).joinedload(Group.level),
             )
         )
         model = await self._session.scalar(stmt)
@@ -63,3 +64,18 @@ class AlchemyUserRepository(UserRepository):
         await self._session.execute(stmt)
         await self._session.flush()
         return user
+
+    async def get_users(self, filter_: UserFilter) -> Sequence[models.User]:
+        stmt = (
+            select(User)
+            .join(User.preferences)
+            .options(
+                joinedload(User.preferences).joinedload(UserPreferences.selected_group).joinedload(Group.level),
+            )
+        )
+        if filter_.selected_group_id is not Unset:
+            stmt = stmt.where(
+                UserPreferences.selected_group_id == filter_.selected_group_id,
+            )
+        results = await self._session.scalars(stmt)
+        return [self._to_domain.map_user(user) for user in results.all()]
