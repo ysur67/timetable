@@ -7,6 +7,7 @@ import aioinject
 from pydantic_settings import BaseSettings
 
 import scraping
+from adapters import telegram
 from adapters.telegram.dependencies import create_bot
 from core.domain import lesson, notifications, user
 from core.impls import alchemy
@@ -24,6 +25,7 @@ MODULES: Iterable[Iterable[aioinject.Provider[Any]]] = [
     lesson.providers,
     user.providers,
     notifications.providers,
+    telegram.providers,
 ]
 
 
