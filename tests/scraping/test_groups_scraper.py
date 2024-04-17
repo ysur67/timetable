@@ -26,4 +26,5 @@ async def _get_groups_count(session: AsyncSession) -> int:
     stmt = select(func.count()).select_from(tables.Group)
     result = (await session.execute(stmt)).one_or_none()
     assert result is not None
-    return int(result.t[0])
+    # https://github.com/sqlalchemy/sqlalchemy/issues/10093
+    return int(result._t[0])  # noqa: SLF001
