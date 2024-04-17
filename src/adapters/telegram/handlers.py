@@ -29,9 +29,7 @@ from lib.dates import utc_now
 
 dispatcher = Dispatcher()
 dispatcher.message.middleware(AioinjectMiddleware(container=create_container()))
-dispatcher.callback_query.middleware(
-    CallbackAioinjectMiddleware(container=create_container()),
-)
+dispatcher.callback_query.middleware(CallbackAioinjectMiddleware(container=create_container()))
 dispatcher.message.middleware(ChatCurrentUserMiddleware())
 dispatcher.callback_query.middleware(CallbackCurrentUserMiddleware())
 
