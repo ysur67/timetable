@@ -48,6 +48,5 @@ class AlchemyTeacherRepository(TeacherRepository):
             .on_conflict_do_nothing(constraint=UniqueTeacherNameConstraint)
             .returning(Teacher)
         )
-        result = await self._session.execute(stmt)
-        row = result.scalar_one()
-        return (self._to_domain.map_teacher(row), True)
+        await self._session.execute(stmt)
+        return (teacher, True)

@@ -48,6 +48,5 @@ class AlchemySubjectRepository(SubjectRepository):
             .on_conflict_do_nothing(constraint=UniqueSubjectTitleConstraint)
             .returning(Subject)
         )
-        result = await self._session.execute(stmt)
-        row = result.scalar_one()
-        return (self._to_domain.map_subject(row), True)
+        await self._session.execute(stmt)
+        return (subject, True)

@@ -91,6 +91,5 @@ class AlchemyLessonRepository(LessonRepository):
             )
             .returning(Lesson)
         )
-        result = await self._session.execute(stmt)
-        row = result.scalar_one()
-        return (self._to_domain.map_lesson(row), True)
+        await self._session.execute(stmt)
+        return (lesson, True)
