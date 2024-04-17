@@ -1,4 +1,5 @@
 {% include 'report_title.jinja2' %}
+
 {% for lesson in report.lessons[batch_index] %}
-{% include 'lesson_list_item.jinja2' %}
+{%- include 'lesson_list_item.jinja2' %}
 {% endfor %}

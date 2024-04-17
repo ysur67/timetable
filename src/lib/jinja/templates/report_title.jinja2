@@ -1,2 +1,2 @@
-Группа {{ report.group.title }} | {% if report.lessons|length > 1 %}стр. №{{ batch_index + 1 }}{% endif %}
+Группа {{ report.group.title }}{% if report.lessons|length > 1 %} | стр. №{{ batch_index + 1 }}{% endif %}
 Расписание с {{ report.date_start }} по {{ report.date_end }}
