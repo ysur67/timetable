@@ -1,13 +1,14 @@
 from typing import final
 
 from sqlalchemy import func, select
+from sqlalchemy.dialects.postgresql import insert
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from core import models
 from core.domain.subject.repositories import SubjectRepository
 from core.impls.alchemy.mappers.alchemy_to_domain_mapper import AlchemyToDomainMapper
 from core.impls.alchemy.mappers.domain_to_alchemy_mapper import DomainToAlchemyMapper
-from core.impls.alchemy.tables.subject import Subject
+from core.impls.alchemy.tables.subject import Subject, UniqueSubjectTitleConstraint
 
 
 @final
@@ -41,7 +42,11 @@ class AlchemySubjectRepository(SubjectRepository):
         self,
         subject: models.Subject,
     ) -> tuple[models.Subject, bool]:
-        model = await self.get_by_title(subject.title)
-        if model is not None:
-            return model, False
-        return await self.create(subject), True
+        stmt = (
+            insert(Subject)
+            .values(id=subject.id, title=subject.title)
+            .on_conflict_do_nothing(constraint=UniqueSubjectTitleConstraint)
+            .returning(Subject)
+        )
+        await self._session.execute(stmt)
+        return (subject, True)

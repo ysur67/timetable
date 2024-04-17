@@ -1,13 +1,14 @@
 from typing import final
 
 from sqlalchemy import func, select
+from sqlalchemy.dialects.postgresql import insert
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from core import models
 from core.domain.teacher.repositories import TeacherRepository
 from core.impls.alchemy.mappers.alchemy_to_domain_mapper import AlchemyToDomainMapper
 from core.impls.alchemy.mappers.domain_to_alchemy_mapper import DomainToAlchemyMapper
-from core.impls.alchemy.tables.teacher import Teacher
+from core.impls.alchemy.tables.teacher import Teacher, UniqueTeacherNameConstraint
 
 
 @final
@@ -41,7 +42,11 @@ class AlchemyTeacherRepository(TeacherRepository):
         self,
         teacher: models.Teacher,
     ) -> tuple[models.Teacher, bool]:
-        model = await self.get_by_name(teacher.name)
-        if model is not None:
-            return model, False
-        return await self.create(teacher), True
+        stmt = (
+            insert(Teacher)
+            .values(id=teacher.id, name=teacher.name)
+            .on_conflict_do_nothing(constraint=UniqueTeacherNameConstraint)
+            .returning(Teacher)
+        )
+        await self._session.execute(stmt)
+        return (teacher, True)
