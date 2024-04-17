@@ -1,13 +1,17 @@
 from typing import final
 
 from sqlalchemy import func, select
+from sqlalchemy.dialects.postgresql import insert
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from core import models
 from core.domain.classroom.repositories import ClassroomRepository
 from core.impls.alchemy.mappers.alchemy_to_domain_mapper import AlchemyToDomainMapper
 from core.impls.alchemy.mappers.domain_to_alchemy_mapper import DomainToAlchemyMapper
-from core.impls.alchemy.tables.classroom import Classroom
+from core.impls.alchemy.tables.classroom import (
+    Classroom,
+    ClassroomUniqueTitleConstraint,
+)
 
 
 @final
@@ -42,7 +46,12 @@ class AlchemyClassroomRepository(ClassroomRepository):
         self,
         classroom: models.Classroom,
     ) -> tuple[models.Classroom, bool]:
-        model = await self.get_by_title(classroom.title)
-        if model is not None:
-            return model, False
-        return await self.create(classroom), True
+        stmt = (
+            insert(Classroom)
+            .values(id=classroom.id, title=classroom.title)
+            .on_conflict_do_nothing(constraint=ClassroomUniqueTitleConstraint)
+            .returning(Classroom)
+        )
+        result = await self._session.execute(stmt)
+        row = result.scalar_one()
+        return (self._to_domain.map_classroom(row), True)

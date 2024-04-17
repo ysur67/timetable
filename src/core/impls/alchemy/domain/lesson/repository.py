@@ -2,14 +2,15 @@ from collections.abc import Sequence
 from typing import final
 
 from sqlalchemy import Select, select
+from sqlalchemy.dialects.postgresql import insert
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy.orm import joinedload
+from sqlalchemy.orm import joinedload, selectinload
 
 from core import models
 from core.domain.lesson.repository import LessonRepository, LessonsFilter
 from core.impls.alchemy.mappers.alchemy_to_domain_mapper import AlchemyToDomainMapper
 from core.impls.alchemy.mappers.domain_to_alchemy_mapper import DomainToAlchemyMapper
-from core.impls.alchemy.tables.lesson import Lesson
+from core.impls.alchemy.tables.lesson import Lesson, UniqueLessonHashConstraint
 
 
 @final
@@ -69,7 +70,27 @@ class AlchemyLessonRepository(LessonRepository):
         return stmt
 
     async def get_or_create(self, lesson: models.Lesson) -> tuple[models.Lesson, bool]:
-        model = await self.get(lesson)
-        if model is not None:
-            return model, False
-        return await self.create(lesson), True
+        stmt = (
+            insert(Lesson)
+            .values(
+                id=lesson.id,
+                date_=lesson.date_,
+                time_start=lesson.time_start,
+                time_end=lesson.time_end,
+                group_id=lesson.group.id,
+                link=lesson.link,
+                note=lesson.note,
+                hash_=lesson.get_hash(),
+            )
+            .on_conflict_do_nothing(constraint=UniqueLessonHashConstraint)
+            .options(
+                selectinload(Lesson.group),
+                selectinload(Lesson.classroom),
+                selectinload(Lesson.subject),
+                selectinload(Lesson.teacher),
+            )
+            .returning(Lesson)
+        )
+        result = await self._session.execute(stmt)
+        row = result.scalar_one()
+        return (self._to_domain.map_lesson(row), True)
