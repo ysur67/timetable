@@ -1,3 +1,4 @@
+import asyncio
 import uuid
 from datetime import timedelta
 from typing import Annotated, assert_never
@@ -10,6 +11,7 @@ from aiogram.utils.keyboard import InlineKeyboardBuilder, ReplyKeyboardBuilder
 from aioinject import Inject, inject
 from result import Err
 
+from adapters.telegram.context import GroupSelectionContext
 from adapters.telegram.middlewares.aioinject_ import (
     AioinjectMiddleware,
     CallbackAioinjectMiddleware,
@@ -24,12 +26,14 @@ from core.domain.group.dtos import GetGroupsByEducationalLevelDto
 from core.domain.group.queries.get_by_educational_level import (
     GetGroupsByEducationalLevelQuery,
 )
+from core.domain.group.queries.get_groups_by_title import SearchGroupsByTitleQuery
 from core.domain.lesson.dtos import GetLessonsReportDto
 from core.domain.lesson.queries.lessons_report import LessonsReportQuery
 from core.domain.lesson.report_renderer import ReportRenderer
 from core.domain.user.commands.set_selected_group import SetSelectedGroupCommand
 from core.domain.user.dtos import SetSelectedGroupDto
 from core.errors import EntityNotFoundError, Never
+from core.models.educational_level import EducationalLevelId
 from core.models.group import GroupId
 from core.models.user import User
 from di import create_container
@@ -131,16 +135,14 @@ async def handle_educational_level_selection(
 ) -> None:
     if callback.data is None:
         raise Never
-    groups = await query.execute(
-        GetGroupsByEducationalLevelDto(level_id=uuid.UUID(callback.data)),
-    )
+    level_id = EducationalLevelId(uuid.UUID(callback.data))
+    groups = await query.execute(GetGroupsByEducationalLevelDto(level_id=level_id))
     if len(groups) == 0:
         await callback.answer(
             "Не удалось найти ни одной группы...",
             show_alert=True,
         )
         return
-    await state.set_state(GroupSelectionState.group_selection)
     builder = InlineKeyboardBuilder()
     for group in groups:
         builder.button(text=group.title, callback_data=str(group.id))
@@ -151,17 +153,26 @@ async def handle_educational_level_selection(
     if isinstance(callback.message, InaccessibleMessage):
         return
 
-    await callback.message.answer(
-        "Выберите одну из групп",
+    reply_message = await callback.message.answer(
+        "Выберите одну из групп\nЕсли отправить сообщение с названием группы, то я постараюсь ее найти",
         reply_markup=builder.as_markup(),
     )
     if isinstance(callback.message, Message):
         await callback.message.delete()
+    await asyncio.gather(
+        state.set_state(GroupSelectionState.group_selection),
+        state.set_data(
+            GroupSelectionContext(
+                before_group_search_message_id=reply_message.message_id,
+                educational_level_id=level_id,
+            ).model_dump(mode="python"),
+        ),
+    )
 
 
 @dispatcher.callback_query(GroupSelectionState.group_selection)
 @inject
-async def handle_group_selection(
+async def handle_group_clicked_callback(
     callback: CallbackQuery,
     state: FSMContext,
     command: Annotated[SetSelectedGroupCommand, Inject],
@@ -189,3 +200,45 @@ async def handle_group_selection(
     await callback.answer(f"Группа {group.title} успешно выбрана")
     if isinstance(callback.message, Message):
         await callback.message.delete()
+
+
+@dispatcher.message(GroupSelectionState.group_selection)
+@inject
+async def handle_group_search_message(
+    message: Message,
+    state: FSMContext,
+    query: Annotated[SearchGroupsByTitleQuery, Inject],
+    bot: Annotated[Bot, Inject],
+) -> None:
+    context_data = GroupSelectionContext.model_validate(await state.get_data())
+    groups = await query.execute(search_term=message.text or "", level_id=context_data.educational_level_id)
+
+    if len(groups) == 0:
+        await message.answer(
+            "Не удалось найти ни одной группы...",
+            show_alert=True,
+        )
+        return
+
+    builder = InlineKeyboardBuilder()
+    for group in groups:
+        builder.button(text=group.title, callback_data=str(group.id))
+    builder.adjust(2)
+
+    reply_message = await message.answer(
+        "Выберите одну из групп\nЕсли отправить сообщение с названием группы, то я постараюсь ее найти",
+        reply_markup=builder.as_markup(),
+    )
+
+    await state.set_data(
+        GroupSelectionContext(
+            before_group_search_message_id=reply_message.message_id,
+            educational_level_id=context_data.educational_level_id,
+        ).model_dump(mode="python"),
+    )
+
+    if context_data.before_group_search_message_id is not None:
+        await bot.delete_message(
+            message.chat.id,
+            message_id=context_data.before_group_search_message_id,
+        )

@@ -9,6 +9,7 @@ from core.domain.educational_level.repositories import EducationalLevelRepositor
 from core.domain.group.queries.get_by_educational_level import (
     GetGroupsByEducationalLevelQuery,
 )
+from core.domain.group.queries.get_groups_by_title import SearchGroupsByTitleQuery
 from core.domain.group.repositories import GroupRepository
 from core.domain.lesson.queries.lessons_report import LessonsReportQuery
 from core.domain.lesson.repository import LessonRepository
@@ -24,6 +25,9 @@ from core.impls.alchemy.domain.educational_level.repository import (
 )
 from core.impls.alchemy.domain.group.queries.get_by_educational_level import (
     AlchemyGetGroupsByEducationalLevelQuery,
+)
+from core.impls.alchemy.domain.group.queries.get_groups_by_title import (
+    AlchemySearchGroupsByTitleQuery,
 )
 from core.impls.alchemy.domain.group.repository import AlchemyGroupRepository
 from core.impls.alchemy.domain.lesson.queries.lessons_report import (
@@ -46,13 +50,8 @@ providers: Iterable[aioinject.Provider[Any]] = [
     aioinject.Scoped(AlchemyClassroomRepository, ClassroomRepository),
     aioinject.Scoped(AlchemyLessonRepository, LessonRepository),
     aioinject.Scoped(AlchemyUserRepository, UserRepository),
-    aioinject.Scoped(
-        AlchemyGetGroupsByEducationalLevelQuery,
-        GetGroupsByEducationalLevelQuery,
-    ),
+    aioinject.Scoped(AlchemyGetGroupsByEducationalLevelQuery, GetGroupsByEducationalLevelQuery),
     aioinject.Scoped(AlchemyLessonsReportQuery, LessonsReportQuery),
-    aioinject.Scoped(
-        AlchemyGetAllEducationalLevelsQuery,
-        GetAllEducationalLevelsQuery,
-    ),
+    aioinject.Scoped(AlchemyGetAllEducationalLevelsQuery, GetAllEducationalLevelsQuery),
+    aioinject.Scoped(AlchemySearchGroupsByTitleQuery, SearchGroupsByTitleQuery),
 ]
