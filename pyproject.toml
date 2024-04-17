@@ -44,7 +44,6 @@ dev = [
 pythonpath = "src"
 filterwarnings = [
     "ignore:'cgi' is deprecated and slated for removal in Python 3.13",
-    "ignore::sqlalchemy.exc.SADeprecationWarning",
 ]
 
 [tool.coverage.run]
