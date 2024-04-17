@@ -75,9 +75,11 @@ async def handle_get_schedule(
             start_date=current_date,
             end_date=current_date + timedelta(days=user.preferences.report_days_offset),
         ),
+        batch_size=10,
     )
     result = await renderer.render(report)
-    await bot.send_message(message.chat.id, result, parse_mode="HTML")
+    for msg in result:
+        await bot.send_message(message.chat.id, msg, parse_mode="HTML")
 
 
 @dispatcher.message(or_f(F.text == "Выбрать группу", Command("/set_group")))

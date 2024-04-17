@@ -6,7 +6,7 @@ from core.models.group import Group
 
 
 class LessonsReport(Model):
-    lessons: Sequence[Lesson]
+    lessons: Sequence[Sequence[Lesson]]
     group: Group
     date_start: date
     date_end: date
