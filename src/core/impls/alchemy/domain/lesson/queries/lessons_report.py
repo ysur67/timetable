@@ -31,7 +31,7 @@ class AlchemyLessonsReportQuery(LessonsReportQuery):
                 Lesson.date_ >= dto.start_date,
                 Lesson.date_ <= dto.end_date,
             )
-            .order_by(Lesson.date_)
+            .order_by(Lesson.date_, Lesson.time_start)
             .options(
                 joinedload(Lesson.group),
                 joinedload(Lesson.classroom),
