@@ -22,10 +22,9 @@ async def test_returns_actual_lesson_by_group(
             start_date=date.min,
             end_date=date.max,
         ),
-        batch_size=10,
     )
-    assert len(result.lessons[0]) == 1
-    found = result.lessons[0][0]
+    assert len(result.lessons) == 1
+    found = result.lessons[0]
     assert found.id == lesson.id
     assert lesson.group.id == found.group.id
 
@@ -56,12 +55,11 @@ async def test_returns_actual_lesson_filtered_by_dates(
             end_date=current_date.replace(month=12, day=31),
             group=group,
         ),
-        batch_size=10,
     )
 
-    assert len(result.lessons[0]) == len(current_year_lessons)
+    assert len(result.lessons) == len(current_year_lessons)
     current_year_ids = {lesson.id for lesson in current_year_lessons}
-    for lesson in result.lessons[0]:
+    for lesson in result.lessons:
         assert lesson.id in current_year_ids
         assert lesson.date_.year == current_date.year
 
@@ -71,10 +69,9 @@ async def test_returns_actual_lesson_filtered_by_dates(
             end_date=current_date.replace(year=current_date.year + 1, month=12, day=31),
             group=group,
         ),
-        batch_size=10,
     )
-    assert len(result.lessons[0]) == len(next_year_lessons)
+    assert len(result.lessons) == len(next_year_lessons)
     next_year_ids = {lesson.id for lesson in next_year_lessons}
-    for lesson in result.lessons[0]:
+    for lesson in result.lessons:
         assert lesson.id in next_year_ids
         assert lesson.date_.year == current_date.year + 1

@@ -8,7 +8,7 @@ class NeoLessonsReportQuery(LessonsReportQuery):
     def __init__(self, repository: LessonRepository) -> None:
         self._repo = repository
 
-    async def execute(self, dto: GetLessonsReportDto, batch_size: int) -> LessonsReport:  # noqa: ARG002
+    async def execute(self, dto: GetLessonsReportDto) -> LessonsReport:
         return LessonsReport(
             lessons=[],
             group=dto.group,

@@ -75,9 +75,8 @@ async def handle_get_schedule(
             start_date=current_date,
             end_date=current_date + timedelta(days=user.preferences.report_days_offset),
         ),
-        batch_size=10,
     )
-    result = await renderer.render(report)
+    result = await renderer.render(report, batch_size=10)
     for msg in result:
         await bot.send_message(message.chat.id, msg, parse_mode="HTML")
 

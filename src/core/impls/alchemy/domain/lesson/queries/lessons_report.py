@@ -1,4 +1,3 @@
-from itertools import batched
 from typing import final
 
 from sqlalchemy import select
@@ -23,7 +22,7 @@ class AlchemyLessonsReportQuery(LessonsReportQuery):
         self._session = session
         self._to_domain_mapper = to_domain_mapper
 
-    async def execute(self, dto: GetLessonsReportDto, batch_size: int) -> models.LessonsReport:
+    async def execute(self, dto: GetLessonsReportDto) -> models.LessonsReport:
         stmt = (
             select(Lesson)
             .where(
@@ -48,7 +47,7 @@ class AlchemyLessonsReportQuery(LessonsReportQuery):
                 date_start=dto.start_date,
                 date_end=dto.end_date,
             )
-        lessons = list(batched([self._to_domain_mapper.map_lesson(lesson) for lesson in rows], batch_size))
+        lessons = [self._to_domain_mapper.map_lesson(lesson) for lesson in rows]
         return models.LessonsReport(
             lessons=lessons,
             group=dto.group,
