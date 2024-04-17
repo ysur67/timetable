@@ -1,5 +1,5 @@
 <b>{% if lesson.subject %}{{ lesson.subject.title | trim }}{% else %}Неизвестный предмет{% endif %}</b>
-Дата: {{ lesson.date_ }}
+Дата: {{ lesson.date_ }} ({{ get_day_of_week(lesson.date_) }})
 {{ lesson.time_start }} - {{ lesson.time_end }}{{ '\n'|safe }}
 {%- if lesson.teacher -%}Преподаватель: {{ lesson.teacher.name | trim }}{{ '\n'|safe }}{%- endif -%}
 {%- if lesson.classroom -%}Аудитория: {{ lesson.classroom.title | trim }}{{ '\n'|safe }}{%- endif -%} 

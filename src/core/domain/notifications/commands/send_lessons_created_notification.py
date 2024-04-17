@@ -27,8 +27,9 @@ class SendLessonsCreatedNotificationCommand:
         for group, lessons in lessons_by_group.items():
             if not lessons:
                 continue
-            msg = await self._notification_renderer.render(
+            messages = await self._notification_renderer.render(
                 group=group,
                 created_lessons=lessons,
             )
-            await self._notification_sender.send(group_id=group.id, message=msg)
+            for msg in messages:
+                await self._notification_sender.send(group_id=group.id, message=msg)

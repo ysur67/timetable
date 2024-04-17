@@ -29,9 +29,7 @@ from lib.dates import utc_now
 
 dispatcher = Dispatcher()
 dispatcher.message.middleware(AioinjectMiddleware(container=create_container()))
-dispatcher.callback_query.middleware(
-    CallbackAioinjectMiddleware(container=create_container()),
-)
+dispatcher.callback_query.middleware(CallbackAioinjectMiddleware(container=create_container()))
 dispatcher.message.middleware(ChatCurrentUserMiddleware())
 dispatcher.callback_query.middleware(CallbackCurrentUserMiddleware())
 
@@ -78,8 +76,9 @@ async def handle_get_schedule(
             end_date=current_date + timedelta(days=user.preferences.report_days_offset),
         ),
     )
-    result = await renderer.render(report)
-    await bot.send_message(message.chat.id, result, parse_mode="HTML")
+    result = await renderer.render(report, batch_size=10)
+    for msg in result:
+        await bot.send_message(message.chat.id, msg, parse_mode="HTML")
 
 
 @dispatcher.message(or_f(F.text == "Выбрать группу", Command("/set_group")))
