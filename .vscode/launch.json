@@ -1,35 +1,43 @@
 {
-    "configurations": [
-        {
-            "name": "Python: Current File",
-            "type": "python",
-            "request": "launch",
-            "program": "${file}",
-            "console": "integratedTerminal",
-            "justMyCode": true
-        },
-        {
-            "name": "Run Scraping",
-            "type": "python",
-            "request": "launch",
-            "program": "${workspaceFolder}/src/scraping/main.py",
-            "console": "integratedTerminal",
-            "justMyCode": true
-        },
-        {
-            "name": "Telegram bot",
-            "type": "python",
-            "request": "launch",
-            "program": "${workspaceFolder}/src/adapters/telegram/main.py",
-            "console": "integratedTerminal",
-            "justMyCode": true
-        },
-        {
-          "name": "Run tests",
-          "type": "python",
-          "request": "launch",
-          "module": "pytest",
-          "args": ["."]
-        }
-    ]
+  "configurations": [
+    {
+      "name": "Run Litestar App",
+      "type": "python",
+      "request": "launch",
+      "module": "uvicorn",
+      "args": ["adapters.litestar.app:app", "--reload"],
+      "console": "integratedTerminal"
+    },
+    {
+      "name": "Python: Current File",
+      "type": "python",
+      "request": "launch",
+      "program": "${file}",
+      "console": "integratedTerminal",
+      "justMyCode": true
+    },
+    {
+      "name": "Run Scraping",
+      "type": "python",
+      "request": "launch",
+      "program": "${workspaceFolder}/src/scraping/main.py",
+      "console": "integratedTerminal",
+      "justMyCode": true
+    },
+    {
+      "name": "Telegram bot",
+      "type": "python",
+      "request": "launch",
+      "program": "${workspaceFolder}/src/adapters/telegram/main.py",
+      "console": "integratedTerminal",
+      "justMyCode": true
+    },
+    {
+      "name": "Run tests",
+      "type": "python",
+      "request": "launch",
+      "module": "pytest",
+      "args": ["."]
+    }
+  ]
 }

@@ -1,6 +1,5 @@
 from datetime import UTC, date, datetime
 
-import pytest
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from core.domain.lesson.dtos import GetLessonsReportDto
@@ -8,8 +7,6 @@ from core.domain.lesson.queries.lessons_report import LessonsReportQuery
 from core.models.group import Group
 from core.models.lesson import Lesson
 from tests.factories.lesson_factory import LessonFactory
-
-pytestmark = [pytest.mark.anyio]
 
 
 async def test_returns_actual_lesson_by_group(

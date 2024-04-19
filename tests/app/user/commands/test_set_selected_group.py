@@ -1,14 +1,10 @@
 import uuid
 
-import pytest
-
 from core.domain.user.commands.set_selected_group import SetSelectedGroupCommand
 from core.domain.user.dtos import SetSelectedGroupDto
 from core.errors import EntityNotFoundError
 from core.models.group import Group, GroupId
 from core.models.user import User
-
-pytestmark = [pytest.mark.anyio]
 
 
 async def test_returns_error_if_there_is_no_such_group(

@@ -6,8 +6,6 @@ from core.impls.alchemy import tables
 from scraping.scrapers.groups_scraper import GroupsScraper
 from tests.scraping.dummies.groups_client import DummyGroupsClient
 
-pytestmark = [pytest.mark.anyio]
-
 
 @pytest.mark.usefixtures("educational_level")
 async def test_scrape_creates_actual_valid_data(
