@@ -11,6 +11,7 @@ from core.domain.group.queries.get_groups_query import (
     GetGroupsQueryPaginated,
 )
 from core.domain.group.repositories import GroupRepository
+from core.domain.lesson.queries.get_lessons_query import GetLessonsQuery
 from core.domain.lesson.queries.lessons_report import LessonsReportQuery
 from core.domain.lesson.repository import LessonRepository
 from core.domain.subject.repositories import SubjectRepository
@@ -28,6 +29,9 @@ from core.impls.alchemy.domain.group.queries.get_groups_query import (
     AlchemyGetGroupsQueryPaginated,
 )
 from core.impls.alchemy.domain.group.repository import AlchemyGroupRepository
+from core.impls.alchemy.domain.lesson.queries.get_lessons_query import (
+    AlchemyGetLessonsQuery,
+)
 from core.impls.alchemy.domain.lesson.queries.lessons_report import (
     AlchemyLessonsReportQuery,
 )
@@ -52,4 +56,5 @@ providers: Iterable[aioinject.Provider[Any]] = [
     aioinject.Scoped(AlchemyGetAllEducationalLevelsQuery, GetAllEducationalLevelsQuery),
     aioinject.Scoped(AlchemyGetGroupsQuery, GetGroupsQuery),
     aioinject.Scoped(AlchemyGetGroupsQueryPaginated, GetGroupsQueryPaginated),
+    aioinject.Scoped(AlchemyGetLessonsQuery, GetLessonsQuery),
 ]

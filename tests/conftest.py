@@ -13,6 +13,7 @@ dotenv.load_dotenv(".env")
 pytest_plugins = [
     "anyio",
     "tests.plugins.database",
+    "tests.plugins.factories",
     "tests.plugins.shared_objects",
     "tests.plugins.repositories",
     "tests.plugins.commands",
