@@ -5,6 +5,7 @@ from aioinject.ext.litestar import AioInjectPlugin
 from litestar import Litestar
 from litestar.config.cors import CORSConfig
 
+from adapters.litestar.routers import educational_level
 from di import create_container
 from lib.settings.litestar import LitestarAppSettings
 
@@ -28,6 +29,7 @@ def create_app() -> Litestar:
         lifespan=[_lifespan],
         cors_config=cors_config,
         plugins=[AioInjectPlugin(container=container)],
+        route_handlers=[educational_level.router],
     )
 
 

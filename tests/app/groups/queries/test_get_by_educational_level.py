@@ -6,8 +6,6 @@ from core.domain.group.queries.get_by_educational_level import (
 )
 from core.models.educational_level import EducationalLevel
 
-pytestmark = [pytest.mark.anyio]
-
 
 async def test_returns_nothing_if_there_are_no_groups(
     get_groups_by_educational_level_query: GetGroupsByEducationalLevelQuery,

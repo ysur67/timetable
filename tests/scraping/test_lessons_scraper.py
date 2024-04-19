@@ -6,8 +6,6 @@ from core.impls.alchemy import tables
 from scraping.scrapers.lessons_scraper import LessonsScraper
 from tests.scraping.dummies.lessons_client import DummyLessonsClient
 
-pytestmark = [pytest.mark.anyio]
-
 
 @pytest.mark.usefixtures("group")
 async def test_scraper_will_create_new_lessons(

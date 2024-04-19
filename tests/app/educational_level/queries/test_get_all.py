@@ -1,9 +1,5 @@
-import pytest
-
 from core.domain.educational_level.queries.get_all import GetAllEducationalLevelsQuery
 from core.models import EducationalLevel
-
-pytestmark = [pytest.mark.anyio]
 
 
 async def test_returns_actual_data_if_there_are_existing_educational_levels(

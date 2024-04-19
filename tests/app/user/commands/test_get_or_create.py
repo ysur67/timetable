@@ -1,6 +1,5 @@
 import uuid
 
-import pytest
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -8,8 +7,6 @@ from core.domain.user.commands.get_or_create_user import GetOrCreateUserCommand
 from core.domain.user.dtos import GetOrCreateUserDto
 from core.impls.alchemy import tables
 from core.models import User, UserTelegramId
-
-pytestmark = [pytest.mark.anyio]
 
 
 async def test_command_will_create_new_user_if_there_is_no_such_telegram_id(
