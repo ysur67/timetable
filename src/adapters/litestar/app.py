@@ -1,6 +1,7 @@
 from collections.abc import AsyncIterator
 from contextlib import aclosing, asynccontextmanager
 
+from aioinject.ext.litestar import AioInjectPlugin
 from litestar import Litestar
 from litestar.config.cors import CORSConfig
 
@@ -8,15 +9,15 @@ from di import create_container
 from lib.settings.litestar import LitestarAppSettings
 
 
-@asynccontextmanager
-async def _lifespan(_app: Litestar) -> AsyncIterator[None]:
-    container = create_container()
-    async with aclosing(container):
-        yield
-
-
 def create_app() -> Litestar:
     app_settings = LitestarAppSettings()
+    container = create_container()
+
+    @asynccontextmanager
+    async def _lifespan(_app: Litestar) -> AsyncIterator[None]:
+        async with aclosing(container):
+            yield
+
     cors_config = CORSConfig(
         allow_origins=app_settings.cors.allow_origins,
         allow_methods=app_settings.cors.allow_methods,
@@ -26,6 +27,7 @@ def create_app() -> Litestar:
     return Litestar(
         lifespan=[_lifespan],
         cors_config=cors_config,
+        plugins=[AioInjectPlugin(container=container)],
     )
 
 
