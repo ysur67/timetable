@@ -11,11 +11,7 @@ from result import Err
 from adapters.telegram.context import GroupSelectionContext
 from adapters.telegram.states import GroupSelectionState
 from core.domain.educational_level.queries.get_all import GetAllEducationalLevelsQuery
-from core.domain.group.dtos import GetGroupsByEducationalLevelDto
-from core.domain.group.queries.get_by_educational_level import (
-    GetGroupsByEducationalLevelQuery,
-)
-from core.domain.group.queries.get_groups_by_title import SearchGroupsByTitleQuery
+from core.domain.group.queries.get_groups_query import GetGroupsQuery, GroupsFilter
 from core.domain.user.commands.set_selected_group import SetSelectedGroupCommand
 from core.domain.user.dtos import SetSelectedGroupDto
 from core.errors import EntityNotFoundError, Never
@@ -30,19 +26,17 @@ class SupportsDumpToJsonDict(Protocol):
 
 class GroupSelectionController:
 
-    def __init__(  # noqa: PLR0913
+    def __init__(
         self,
         bot: Bot,
         get_educational_levels_query: GetAllEducationalLevelsQuery,
-        get_groups_by_educational_level_query: GetGroupsByEducationalLevelQuery,
+        get_groups_query: GetGroupsQuery,
         set_selected_group_command: SetSelectedGroupCommand,
-        search_groups_query: SearchGroupsByTitleQuery,
     ) -> None:
         self._bot = bot
         self._get_educational_levels_query = get_educational_levels_query
-        self._get_groups_by_educational_level_query = get_groups_by_educational_level_query
         self._set_selected_group_command = set_selected_group_command
-        self._search_groups_query = search_groups_query
+        self._groups_query = get_groups_query
 
     async def offer_educational_level_selection(self, *, message: Message, state: FSMContext) -> None:
         await state.set_state(GroupSelectionState.educational_level_selection)
@@ -67,9 +61,7 @@ class GroupSelectionController:
         if callback.data is None:
             raise Never
         level_id = EducationalLevelId(uuid.UUID(callback.data))
-        groups = await self._get_groups_by_educational_level_query.execute(
-            GetGroupsByEducationalLevelDto(level_id=level_id),
-        )
+        groups = await self._groups_query.execute(GroupsFilter(educational_level_id=level_id))
         if len(groups) == 0:
             await callback.answer(
                 "Не удалось найти ни одной группы...",
@@ -106,9 +98,11 @@ class GroupSelectionController:
 
     async def search_groups(self, *, message: Message, state: FSMContext) -> None:
         context_data = GroupSelectionContext.model_validate(await state.get_data())
-        groups = await self._search_groups_query.execute(
-            search_term=message.text or "",
-            level_id=context_data.educational_level_id,
+        groups = await self._groups_query.execute(
+            GroupsFilter(
+                search_term=message.text or "",
+                educational_level_id=context_data.educational_level_id,
+            ),
         )
 
         if len(groups) == 0:
