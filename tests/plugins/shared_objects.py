@@ -8,7 +8,7 @@ from core.models.lesson import Lesson
 from core.models.user import User
 from tests.factories.educational_level_factory import EducationalLevelFactory
 from tests.factories.group_factory import GroupFactory
-from tests.factories.lesson_factory import LessonFactory
+from tests.factories.lessons_factory import TestLessonFactory
 from tests.factories.user_factory import UserFactory, UserPreferencesFactory
 
 
@@ -54,15 +54,5 @@ async def user(
 
 
 @pytest.fixture()
-async def lesson(
-    session: AsyncSession,
-    group: Group,
-    alchemy_to_domain_mapper: AlchemyToDomainMapper,
-) -> Lesson:
-    lesson = LessonFactory.build(group_id=str(group.id))
-    session.add(lesson)
-    await session.flush()
-    db_group = await session.get(tables.Group, str(group.id))
-    assert db_group is not None
-    lesson.group = db_group
-    return alchemy_to_domain_mapper.map_lesson(lesson)
+async def lesson(group: Group, lesson_factory: TestLessonFactory) -> Lesson:
+    return await lesson_factory.create(group_id=group.id)

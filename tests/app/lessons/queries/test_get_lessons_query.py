@@ -2,7 +2,7 @@ from core.domain.lesson.queries.get_lessons_query import GetLessonsQuery, Lesson
 from core.dtos import PaginationDto
 from core.models import Group
 from lib.dates import utc_now
-from tests.app.utils.lessons import TestLessonFactory
+from tests.factories.lessons_factory import TestLessonFactory
 
 
 async def test_returns_empty_object_if_there_are_no_lessons(get_lessons_query: GetLessonsQuery) -> None:

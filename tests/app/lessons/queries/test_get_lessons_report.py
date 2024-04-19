@@ -4,7 +4,7 @@ from core.domain.lesson.dtos import GetLessonsReportDto
 from core.domain.lesson.queries.lessons_report import LessonsReportQuery
 from core.models.group import Group
 from core.models.lesson import Lesson
-from tests.app.utils.lessons import TestLessonFactory
+from tests.factories.lessons_factory import TestLessonFactory
 
 
 async def test_returns_actual_lesson_by_group(

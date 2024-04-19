@@ -2,7 +2,7 @@ import pytest
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from core.impls.alchemy.mappers.alchemy_to_domain_mapper import AlchemyToDomainMapper
-from tests.app.utils.lessons import TestLessonFactory
+from tests.factories.lessons_factory import TestLessonFactory
 
 
 @pytest.fixture()
