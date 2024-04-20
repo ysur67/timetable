@@ -1,17 +1,17 @@
 import asyncio
+import time
 
 from di import create_container
-from scraping.scrapers.groups_scraper import GroupsScraper
-from scraping.scrapers.lessons_scraper import LessonsScraper
+from scraping.tasks.scrape_lessons import ScrapeLessonsTask
 
 
 async def main() -> None:
+    start = time.perf_counter()
     container = create_container()
     async with container.context() as context:
-        groups_scraper = await context.resolve(GroupsScraper)
-        await groups_scraper.scrape()
-        lessons_scraper = await context.resolve(LessonsScraper)
-        await lessons_scraper.scrape()
+        task = await context.resolve(ScrapeLessonsTask)
+        await task.scrape()
+    print(f"new end: {time.perf_counter() - start}")  # noqa: T201
 
 
 if __name__ == "__main__":

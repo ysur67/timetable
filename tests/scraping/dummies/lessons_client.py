@@ -1,5 +1,6 @@
 import uuid
 from collections.abc import Sequence
+from datetime import date
 from typing import Final, final
 
 from faker import Faker
@@ -32,7 +33,13 @@ class DummyLessonsClient(LessonsClient):
         self._faker = faker
         self._mapper = mapper
 
-    async def get_all(self, level: EducationalLevel) -> Sequence[LessonSchema]:
+    async def get_all(
+        self,
+        level: EducationalLevel,
+        *,
+        start_date: date,  # noqa: ARG002
+        end_date: date,  # noqa: ARG002
+    ) -> Sequence[LessonSchema]:
         stmt = (
             select(tables.Group).where(tables.Group.level_id == str(level.id)).options(joinedload(tables.Group.level))
         )
