@@ -16,7 +16,7 @@ from core.dtos import PaginationDto
 
 @get("")
 @inject
-async def get_lessons(  # noqa: PLR0913
+async def get_lessons(
     lessons_query: Annotated[GetLessonsQuery, Inject],
     group_id: uuid.UUID | None = None,
     date_start: date | None = None,

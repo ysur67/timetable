@@ -6,6 +6,8 @@ from typing import Any
 
 import aioinject
 import httpx
+from pydantic import BaseModel
+from result import Err, Ok, Result
 
 from core.domain.classroom.repositories import (
     ClassroomRepository,
@@ -13,11 +15,14 @@ from core.domain.classroom.repositories import (
 )
 from core.domain.educational_level.repositories import EducationalLevelRepository
 from core.domain.group.repositories import GroupRepository
-from core.domain.lesson.repository import LessonRepository
+from core.domain.lesson.repository import GetOrCreateLessonParams, LessonRepository
+from core.domain.notifications.commands.send_lessons_created_notification import (
+    SendLessonsCreatedNotificationCommand,
+)
 from core.domain.subject.repositories import GetOrCreateSubjectParams, SubjectRepository
 from core.domain.teacher.repositories import GetOrCreateTeacherParams, TeacherRepository
 from core.models.classroom import Classroom
-from core.models.lesson import Lesson, LessonId
+from core.models.lesson import Lesson
 from core.models.subject import Subject, SubjectId
 from core.models.teacher import Teacher
 from lib.dates import paginate_date_range, utc_now
@@ -29,16 +34,26 @@ from scraping.schemas.lesson import LessonSchema
 LessonsClientFactory = Callable[[], LessonsClient]
 
 
+class MissingGroupError(BaseModel):
+    title: str
+
+
+class _ProcessLessonSchemasResult(BaseModel):
+    created_lessons: list[Lesson]
+
+
 class ScrapeLessonsTask:
 
     def __init__(
         self,
         educational_level_repo: EducationalLevelRepository,
         client_factory: LessonsClientFactory,
+        send_notifications_command: SendLessonsCreatedNotificationCommand,
         process: "_ProcessLessonSchemas",
     ) -> None:
         self._level_repo = educational_level_repo
         self._client_factory = client_factory
+        self._send_notifications_command = send_notifications_command
         self._process = process
         self._logger = get_default_logger(self.__class__.__name__)
 
@@ -57,20 +72,24 @@ class ScrapeLessonsTask:
         client_responses = await asyncio.gather(*tasks, return_exceptions=True)
         batched_schemas: list[Sequence[LessonSchema]] = []
         errors: list[BaseException] = []
-        for el in client_responses:
-            if isinstance(el, BaseException):
-                errors.append(el)
+        for response in client_responses:
+            if isinstance(response, BaseException):
+                errors.append(response)
             else:
-                batched_schemas.append(el)
+                batched_schemas.append(response)
         if errors:
             for err in errors:
                 self._logger.exception(err)
-        for batch in batched_schemas:
-            await self._process.process(batch)
+
+        created_lessons = [
+            lesson for batch in batched_schemas for lesson in (await self._process.process(batch)).created_lessons
+        ]
+        if len(created_lessons) > 0:
+            await self._send_notifications_command.execute(created_lessons)
 
 
 class _ProcessLessonSchemas:
-    def __init__(  # noqa: PLR0913
+    def __init__(
         self,
         educational_level_repository: EducationalLevelRepository,
         group_repository: GroupRepository,
@@ -87,25 +106,31 @@ class _ProcessLessonSchemas:
         self._lesson_repository = lesson_repository
         self._logger = get_default_logger(self.__class__.__name__)
 
-    async def process(self, schemas: Sequence[LessonSchema]) -> None:
+    async def process(self, schemas: Sequence[LessonSchema]) -> _ProcessLessonSchemasResult:
+        created_lessons: list[Lesson] = []
         for schema in schemas:
-            await self._scrape_lesson(schema)
+            scrape_result = await self._scrape_lesson(schema)
+            if isinstance(scrape_result, Err):
+                self._logger.error(
+                    "Couldn't find group by title %s. Skipping %s creation...",
+                    schema.group.title,
+                    Lesson.__name__,
+                )
+                continue
+            lesson, is_created = scrape_result.ok()
+            if is_created is True:
+                created_lessons.append(lesson)
+        return _ProcessLessonSchemasResult(created_lessons=created_lessons)
 
-    async def _scrape_lesson(self, schema: LessonSchema) -> Lesson | None:
+    async def _scrape_lesson(self, schema: LessonSchema) -> Result[tuple[Lesson, bool], MissingGroupError]:
         group = await self._group_repository.get_by_title(schema.group.title)
         if group is None:
-            self._logger.error(
-                "Couldn't find group by title %s. Skipping %s creation...",
-                schema.group.title,
-                Lesson.__name__,
-            )
-            return None
+            return Err(MissingGroupError(title=schema.group.title))
         self._logger.info("Processing %s", schema)
         classroom = await self._get_classroom(schema)
         subject = await self._get_subject(schema)
         teacher = await self._get_teacher(schema)
-        lesson = Lesson(
-            id=LessonId(uuid.uuid4()),
+        params = GetOrCreateLessonParams(
             date_=schema.date_,
             time_start=schema.starts_at,
             time_end=schema.ends_at,
@@ -116,9 +141,9 @@ class _ProcessLessonSchemas:
             classroom=classroom,
             note=schema.note,
         )
-        lesson, _ = await self._lesson_repository.get_or_create(lesson)
+        lesson, is_created = await self._lesson_repository.get_or_create(params)
         self._logger.info("Found %s with id %s", Lesson.__name__, lesson.id)
-        return lesson
+        return Ok((lesson, is_created))
 
     async def _get_teacher(self, schema: LessonSchema) -> Teacher | None:
         if schema.teacher is None:
