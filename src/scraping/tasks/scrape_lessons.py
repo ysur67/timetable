@@ -15,7 +15,7 @@ from core.domain.classroom.repositories import (
 )
 from core.domain.educational_level.repositories import EducationalLevelRepository
 from core.domain.group.repositories import GroupRepository
-from core.domain.lesson.queries.commands.delete_outdated_lessons import (
+from core.domain.lesson.commands.delete_outdated_lessons import (
     DeleteOutdatedLessonsCommand,
     DeleteOutdatedLessonsDto,
 )
