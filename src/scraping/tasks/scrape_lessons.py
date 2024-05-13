@@ -42,7 +42,7 @@ class MissingGroupError(BaseModel):
     title: str
 
 
-class _ProcessLessonSchemasResult(BaseModel):
+class ProcessLessonSchemaResult(BaseModel):
     created_lessons: list[Lesson]
     processed_lessons: list[Lesson]
 
@@ -55,13 +55,13 @@ class ScrapeLessonsTask:
         client_factory: LessonsClientFactory,
         send_notifications_command: SendLessonsCreatedNotificationCommand,
         delete_outdated_lessons_command: DeleteOutdatedLessonsCommand,
-        process: "_ProcessLessonSchemas",
+        lesson_schema_handler: "LessonSchemaHandler",
     ) -> None:
         self._level_repo = educational_level_repo
         self._client_factory = client_factory
         self._send_notifications_command = send_notifications_command
         self._delete_outdated_lessons_command = delete_outdated_lessons_command
-        self._process = process
+        self._schema_handler = lesson_schema_handler
         self._logger = get_default_logger(self.__class__.__name__)
 
     async def scrape(self) -> None:
@@ -91,7 +91,7 @@ class ScrapeLessonsTask:
         created_lessons: list[Lesson] = []
         processed_lessons: list[Lesson] = []
         for batch in batched_schemas:
-            result = await self._process.process(batch)
+            result = await self._schema_handler.process_schemas(batch)
             if len(result.created_lessons) > 0:
                 created_lessons.extend(result.created_lessons)
             if len(result.processed_lessons) > 0:
@@ -106,7 +106,7 @@ class ScrapeLessonsTask:
             )
 
 
-class _ProcessLessonSchemas:
+class LessonSchemaHandler:
     def __init__(
         self,
         educational_level_repository: EducationalLevelRepository,
@@ -124,7 +124,7 @@ class _ProcessLessonSchemas:
         self._lesson_repository = lesson_repository
         self._logger = get_default_logger(self.__class__.__name__)
 
-    async def process(self, schemas: Sequence[LessonSchema]) -> _ProcessLessonSchemasResult:
+    async def process_schemas(self, schemas: Sequence[LessonSchema]) -> ProcessLessonSchemaResult:
         created_lessons: list[Lesson] = []
         processed_lessons: list[Lesson] = []
         for schema in schemas:
@@ -140,7 +140,7 @@ class _ProcessLessonSchemas:
             processed_lessons.append(lesson)
             if is_created is True:
                 created_lessons.append(lesson)
-        return _ProcessLessonSchemasResult(created_lessons=created_lessons, processed_lessons=processed_lessons)
+        return ProcessLessonSchemaResult(created_lessons=created_lessons, processed_lessons=processed_lessons)
 
     async def _scrape_lesson(self, schema: LessonSchema) -> Result[tuple[Lesson, bool], MissingGroupError]:
         group = await self._group_repository.get_by_title(schema.group.title)
@@ -202,6 +202,6 @@ def _lesson_client_factory() -> HttpLessonsClient:
 
 
 providers: list[aioinject.Provider[Any]] = [
-    aioinject.Scoped(_ProcessLessonSchemas),
+    aioinject.Scoped(LessonSchemaHandler),
     aioinject.Scoped(lambda: _lesson_client_factory, LessonsClientFactory),  # type: ignore[arg-type]
 ]
