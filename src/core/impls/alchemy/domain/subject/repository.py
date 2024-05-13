@@ -1,14 +1,15 @@
 from typing import final
 
-from sqlalchemy import func, select
+from sqlalchemy import Exists, func, literal, select
 from sqlalchemy.dialects.postgresql import insert
 from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.orm import aliased
 
 from core import models
-from core.domain.subject.repositories import SubjectRepository
+from core.domain.subject.repositories import GetOrCreateSubjectParams, SubjectRepository
 from core.impls.alchemy.mappers.alchemy_to_domain_mapper import AlchemyToDomainMapper
 from core.impls.alchemy.mappers.domain_to_alchemy_mapper import DomainToAlchemyMapper
-from core.impls.alchemy.tables.subject import Subject, UniqueSubjectTitleConstraint
+from core.impls.alchemy.tables.subject import Subject
 
 
 @final
@@ -38,15 +39,22 @@ class AlchemySubjectRepository(SubjectRepository):
         await self._session.flush()
         return subject
 
-    async def get_or_create(
-        self,
-        subject: models.Subject,
-    ) -> tuple[models.Subject, bool]:
-        stmt = (
-            insert(Subject)
-            .values(id=subject.id, title=subject.title)
-            .on_conflict_do_nothing(constraint=UniqueSubjectTitleConstraint)
-            .returning(Subject)
+    async def get_or_create(self, params: GetOrCreateSubjectParams) -> tuple[models.Subject, bool]:
+        extant = aliased(Subject, select(Subject.id).where(Subject.title == params.title).cte("extant"))
+        inserted = aliased(
+            Subject,
+            (
+                insert(Subject)
+                .from_select(
+                    ["id", "title"],
+                    select(literal(params.id).label("id"), literal(params.title).label("title")).where(~Exists(extant)),
+                )
+                .returning(Subject)
+                .cte("inserted")
+            ),
         )
-        await self._session.execute(stmt)
-        return (subject, True)
+        stmt = select(inserted.id, literal(value=True).label("is_created")).union_all(
+            select(extant.id, literal(value=False).label("is_created")),
+        )
+        ident, is_created = (await self._session.execute(stmt)).one()
+        return (models.Subject(id=ident, title=params.title), is_created)

@@ -1,17 +1,22 @@
+import uuid
 from typing import final
 
-from sqlalchemy import func, select
+from sqlalchemy import Exists, func, literal, select
 from sqlalchemy.dialects.postgresql import insert
 from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.orm import aliased
 
 from core import models
-from core.domain.classroom.repositories import ClassroomRepository
+from core.domain.classroom.repositories import (
+    ClassroomRepository,
+    GetOrCreateClassroomParams,
+)
 from core.impls.alchemy.mappers.alchemy_to_domain_mapper import AlchemyToDomainMapper
 from core.impls.alchemy.mappers.domain_to_alchemy_mapper import DomainToAlchemyMapper
 from core.impls.alchemy.tables.classroom import (
     Classroom,
-    ClassroomUniqueTitleConstraint,
 )
+from core.models.classroom import ClassroomId
 
 
 @final
@@ -42,15 +47,26 @@ class AlchemyClassroomRepository(ClassroomRepository):
         await self._session.flush()
         return classroom
 
-    async def get_or_create(
-        self,
-        classroom: models.Classroom,
-    ) -> tuple[models.Classroom, bool]:
-        stmt = (
-            insert(Classroom)
-            .values(id=classroom.id, title=classroom.title)
-            .on_conflict_do_nothing(constraint=ClassroomUniqueTitleConstraint)
-            .returning(Classroom)
+    async def get_or_create(self, params: GetOrCreateClassroomParams) -> tuple[models.Classroom, bool]:
+        ident = self._generate_id()
+        extant = aliased(Classroom, select(Classroom.id).where(Classroom.title == params.title).cte("extant"))
+        inserted = aliased(
+            Classroom,
+            (
+                insert(Classroom)
+                .from_select(
+                    ["id", "title"],
+                    select(literal(ident).label("id"), literal(params.title).label("title")).where(~Exists(extant)),
+                )
+                .returning(Classroom)
+                .cte("inserted")
+            ),
         )
-        await self._session.execute(stmt)
-        return (classroom, True)
+        stmt = select(inserted.id, literal(value=True).label("is_created")).union_all(
+            select(extant.id, literal(value=False).label("is_created")),
+        )
+        ident, is_created = (await self._session.execute(stmt)).one()
+        return (models.Classroom(id=ident, title=params.title), is_created)
+
+    def _generate_id(self) -> ClassroomId:
+        return ClassroomId(uuid.uuid4())

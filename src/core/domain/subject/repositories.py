@@ -1,6 +1,14 @@
+import uuid
 from typing import Protocol
 
+from pydantic import BaseModel
+
 from core.models import Subject
+
+
+class GetOrCreateSubjectParams(BaseModel):
+    id: uuid.UUID
+    title: str
 
 
 class SubjectRepository(Protocol):
@@ -8,4 +16,4 @@ class SubjectRepository(Protocol):
 
     async def create(self, subject: Subject) -> Subject: ...
 
-    async def get_or_create(self, subject: Subject) -> tuple[Subject, bool]: ...
+    async def get_or_create(self, params: GetOrCreateSubjectParams) -> tuple[Subject, bool]: ...

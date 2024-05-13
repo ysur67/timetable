@@ -1,6 +1,12 @@
 from typing import Protocol
 
+from pydantic import BaseModel
+
 from core.models import Teacher
+
+
+class GetOrCreateTeacherParams(BaseModel):
+    name: str
 
 
 class TeacherRepository(Protocol):
@@ -8,4 +14,4 @@ class TeacherRepository(Protocol):
 
     async def create(self, teacher: Teacher) -> Teacher: ...
 
-    async def get_or_create(self, teacher: Teacher) -> tuple[Teacher, bool]: ...
+    async def get_or_create(self, params: GetOrCreateTeacherParams) -> tuple[Teacher, bool]: ...

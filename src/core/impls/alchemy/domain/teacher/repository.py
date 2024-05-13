@@ -1,14 +1,17 @@
+import uuid
 from typing import final
 
-from sqlalchemy import func, select
+from sqlalchemy import Exists, func, literal, select
 from sqlalchemy.dialects.postgresql import insert
 from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.orm import aliased
 
 from core import models
-from core.domain.teacher.repositories import TeacherRepository
+from core.domain.teacher.repositories import GetOrCreateTeacherParams, TeacherRepository
 from core.impls.alchemy.mappers.alchemy_to_domain_mapper import AlchemyToDomainMapper
 from core.impls.alchemy.mappers.domain_to_alchemy_mapper import DomainToAlchemyMapper
-from core.impls.alchemy.tables.teacher import Teacher, UniqueTeacherNameConstraint
+from core.impls.alchemy.tables.teacher import Teacher
+from core.models.teacher import TeacherId
 
 
 @final
@@ -40,13 +43,27 @@ class AlchemyTeacherRepository(TeacherRepository):
 
     async def get_or_create(
         self,
-        teacher: models.Teacher,
+        params: GetOrCreateTeacherParams,
     ) -> tuple[models.Teacher, bool]:
-        stmt = (
-            insert(Teacher)
-            .values(id=teacher.id, name=teacher.name)
-            .on_conflict_do_nothing(constraint=UniqueTeacherNameConstraint)
-            .returning(Teacher)
+        ident = self._generate_id()
+        extant = aliased(Teacher, select(Teacher.id).where(Teacher.name == params.name).cte("extant"))
+        inserted = aliased(
+            Teacher,
+            (
+                insert(Teacher)
+                .from_select(
+                    ["id", "name"],
+                    select(literal(ident).label("id"), literal(params.name).label("name")).where(~Exists(extant)),
+                )
+                .returning(Teacher)
+                .cte("inserted")
+            ),
         )
-        await self._session.execute(stmt)
-        return (teacher, True)
+        stmt = select(inserted.id, literal(value=True).label("is_created")).union_all(
+            select(extant.id, literal(value=False).label("is_created")),
+        )
+        ident, is_created = (await self._session.execute(stmt)).one()
+        return (models.Teacher(id=ident, name=params.name), is_created)
+
+    def _generate_id(self) -> TeacherId:
+        return TeacherId(uuid.uuid4())

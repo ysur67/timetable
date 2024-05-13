@@ -57,6 +57,9 @@ class AlchemyLessonRepository(LessonRepository):
                 group_id=lesson.group.id,
                 link=lesson.link,
                 note=lesson.note,
+                subject_id=lesson.subject.id if lesson.subject is not None else None,
+                teacher_id=lesson.teacher.id if lesson.teacher is not None else None,
+                classroom_id=lesson.classroom.id if lesson.classroom is not None else None,
                 hash_=lesson.get_hash(),
             )
             .on_conflict_do_nothing(constraint=UniqueLessonHashConstraint)

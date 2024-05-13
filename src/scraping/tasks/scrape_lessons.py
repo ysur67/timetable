@@ -7,16 +7,19 @@ from typing import Any
 import aioinject
 import httpx
 
-from core.domain.classroom.repositories import ClassroomRepository
+from core.domain.classroom.repositories import (
+    ClassroomRepository,
+    GetOrCreateClassroomParams,
+)
 from core.domain.educational_level.repositories import EducationalLevelRepository
 from core.domain.group.repositories import GroupRepository
 from core.domain.lesson.repository import LessonRepository
-from core.domain.subject.repositories import SubjectRepository
-from core.domain.teacher.repositories import TeacherRepository
-from core.models.classroom import Classroom, ClassroomId
+from core.domain.subject.repositories import GetOrCreateSubjectParams, SubjectRepository
+from core.domain.teacher.repositories import GetOrCreateTeacherParams, TeacherRepository
+from core.models.classroom import Classroom
 from core.models.lesson import Lesson, LessonId
 from core.models.subject import Subject, SubjectId
-from core.models.teacher import Teacher, TeacherId
+from core.models.teacher import Teacher
 from lib.dates import paginate_date_range, utc_now
 from lib.logger import get_default_logger
 from scraping.clients.lessons.http_client import HttpLessonsClient
@@ -121,10 +124,7 @@ class _ProcessLessonSchemas:
         if schema.teacher is None:
             return None
         result, _ = await self._teacher_repository.get_or_create(
-            Teacher(
-                id=TeacherId(uuid.uuid4()),
-                name=schema.teacher.name,
-            ),
+            GetOrCreateTeacherParams(name=schema.teacher.name),
         )
         self._logger.info("Got %s with id %s", Teacher.__name__, result.id)
         return result
@@ -133,7 +133,7 @@ class _ProcessLessonSchemas:
         if schema.subject is None:
             return None
         result, _ = await self._subject_repository.get_or_create(
-            Subject(
+            GetOrCreateSubjectParams(
                 id=SubjectId(uuid.uuid4()),
                 title=schema.subject.title,
             ),
@@ -145,10 +145,7 @@ class _ProcessLessonSchemas:
         if schema.classroom is None:
             return None
         result, _ = await self._classroom_repository.get_or_create(
-            Classroom(
-                id=ClassroomId(uuid.uuid4()),
-                title=schema.classroom.title,
-            ),
+            GetOrCreateClassroomParams(title=schema.classroom.title),
         )
         self._logger.info("Got %s with id %s", Classroom.__name__, result.id)
         return result
