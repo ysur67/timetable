@@ -10,7 +10,8 @@ from scraping.clients.groups.http_client import HttpGroupsClient
 from scraping.clients.lessons.http_client import HttpLessonsClient
 from scraping.clients.lessons.lessons_client import LessonsClient
 from scraping.scrapers.groups_scraper import GroupsScraper
-from scraping.scrapers.lessons_scraper import LessonsScraper
+from scraping.tasks import scrape_lessons
+from scraping.tasks.scrape_lessons import ScrapeLessonsTask
 
 
 @contextlib.asynccontextmanager
@@ -24,5 +25,6 @@ providers: Iterable[aioinject.Provider[Any]] = [
     aioinject.Scoped(HttpGroupsClient, type_=GroupsClient),
     aioinject.Scoped(HttpLessonsClient, type_=LessonsClient),
     aioinject.Scoped(GroupsScraper),
-    aioinject.Scoped(LessonsScraper),
+    aioinject.Scoped(ScrapeLessonsTask),
+    *scrape_lessons.providers,
 ]

@@ -1,7 +1,7 @@
 import operator
 import re
 from collections.abc import Sequence
-from datetime import UTC, date, datetime, time, timedelta
+from datetime import UTC, date, datetime, time
 from functools import reduce
 from typing import Final, final
 
@@ -60,9 +60,9 @@ class HttpLessonsClient(LessonsClient):
     def __init__(self, client: httpx.AsyncClient) -> None:
         self._client = client
 
-    async def get_all(self, level: EducationalLevel) -> Sequence[LessonSchema]:
+    async def get_all(self, level: EducationalLevel, *, start_date: date, end_date: date) -> Sequence[LessonSchema]:
         result: list[LessonSchema] = []
-        params = self._build_request_params(level)
+        params = self._build_request_params(level, start_date=start_date, end_date=end_date)
         parser = await self._get_html_parser(params)
         for title_node in parser.tags("h4"):
             parent_center = title_node.parent
@@ -234,14 +234,17 @@ class HttpLessonsClient(LessonsClient):
         response.raise_for_status()
         return HTMLParser(response.text)
 
-    def _build_request_params(self, level: EducationalLevel) -> _LessonsRequestParams:
-        today = datetime.now(tz=UTC).date()
-        start_date = today - timedelta(days=7)
-        finish_date = today + timedelta(days=40)
+    def _build_request_params(
+        self,
+        level: EducationalLevel,
+        *,
+        start_date: date,
+        end_date: date,
+    ) -> _LessonsRequestParams:
         return _LessonsRequestParams(
             ucstep=level.code,
             datafrom=_LessonsRequestParams.date_to_request(start_date),
-            dataend=_LessonsRequestParams.date_to_request(finish_date),
+            dataend=_LessonsRequestParams.date_to_request(end_date),
         )
 
     def _get_url_from_string(self, value: str) -> str:
