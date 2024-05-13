@@ -1,7 +1,7 @@
 import uuid
 from typing import final
 
-from sqlalchemy import Exists, literal, select
+from sqlalchemy import Exists, delete, literal, select
 from sqlalchemy.dialects.postgresql import insert
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import aliased, joinedload
@@ -47,6 +47,10 @@ class AlchemyLessonRepository(LessonRepository):
         self._session.add(model)
         await self._session.flush()
         return lesson
+
+    async def delete_outdated_ids(self, existing_ids: list[LessonId]) -> None:
+        stmt = delete(Lesson).where(Lesson.id.not_in(existing_ids))
+        await self._session.execute(stmt)
 
     async def get_or_create(self, params: GetOrCreateLessonParams) -> tuple[models.Lesson, bool]:
         ident = self._generate_id()

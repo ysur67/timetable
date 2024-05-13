@@ -6,6 +6,7 @@ from pydantic import BaseModel
 from core.models import Classroom, Group, Lesson, Subject, Teacher
 from core.models.classroom import ClassroomId
 from core.models.group import GroupId
+from core.models.lesson import LessonId
 from core.models.subject import SubjectId
 from core.models.teacher import TeacherId
 
@@ -51,3 +52,5 @@ class LessonRepository(Protocol):
     async def create(self, lesson: Lesson) -> Lesson: ...
 
     async def get_or_create(self, params: GetOrCreateLessonParams) -> tuple[Lesson, bool]: ...
+
+    async def delete_outdated_ids(self, existing_ids: list[LessonId]) -> None: ...

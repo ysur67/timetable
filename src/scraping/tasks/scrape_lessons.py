@@ -15,6 +15,10 @@ from core.domain.classroom.repositories import (
 )
 from core.domain.educational_level.repositories import EducationalLevelRepository
 from core.domain.group.repositories import GroupRepository
+from core.domain.lesson.queries.commands.delete_outdated_lessons import (
+    DeleteOutdatedLessonsCommand,
+    DeleteOutdatedLessonsDto,
+)
 from core.domain.lesson.repository import GetOrCreateLessonParams, LessonRepository
 from core.domain.notifications.commands.send_lessons_created_notification import (
     SendLessonsCreatedNotificationCommand,
@@ -40,6 +44,7 @@ class MissingGroupError(BaseModel):
 
 class _ProcessLessonSchemasResult(BaseModel):
     created_lessons: list[Lesson]
+    processed_lessons: list[Lesson]
 
 
 class ScrapeLessonsTask:
@@ -49,11 +54,13 @@ class ScrapeLessonsTask:
         educational_level_repo: EducationalLevelRepository,
         client_factory: LessonsClientFactory,
         send_notifications_command: SendLessonsCreatedNotificationCommand,
+        delete_outdated_lessons_command: DeleteOutdatedLessonsCommand,
         process: "_ProcessLessonSchemas",
     ) -> None:
         self._level_repo = educational_level_repo
         self._client_factory = client_factory
         self._send_notifications_command = send_notifications_command
+        self._delete_outdated_lessons_command = delete_outdated_lessons_command
         self._process = process
         self._logger = get_default_logger(self.__class__.__name__)
 
@@ -81,11 +88,22 @@ class ScrapeLessonsTask:
             for err in errors:
                 self._logger.exception(err)
 
-        created_lessons = [
-            lesson for batch in batched_schemas for lesson in (await self._process.process(batch)).created_lessons
-        ]
+        created_lessons: list[Lesson] = []
+        processed_lessons: list[Lesson] = []
+        for batch in batched_schemas:
+            result = await self._process.process(batch)
+            if len(result.created_lessons) > 0:
+                created_lessons.extend(result.created_lessons)
+            if len(result.processed_lessons) > 0:
+                processed_lessons.extend(result.processed_lessons)
+
         if len(created_lessons) > 0:
             await self._send_notifications_command.execute(created_lessons)
+
+        if len(processed_lessons) > 0:
+            await self._delete_outdated_lessons_command.execute(
+                DeleteOutdatedLessonsDto(existing_lessons=processed_lessons),
+            )
 
 
 class _ProcessLessonSchemas:
@@ -108,6 +126,7 @@ class _ProcessLessonSchemas:
 
     async def process(self, schemas: Sequence[LessonSchema]) -> _ProcessLessonSchemasResult:
         created_lessons: list[Lesson] = []
+        processed_lessons: list[Lesson] = []
         for schema in schemas:
             scrape_result = await self._scrape_lesson(schema)
             if isinstance(scrape_result, Err):
@@ -118,9 +137,10 @@ class _ProcessLessonSchemas:
                 )
                 continue
             lesson, is_created = scrape_result.ok()
+            processed_lessons.append(lesson)
             if is_created is True:
                 created_lessons.append(lesson)
-        return _ProcessLessonSchemasResult(created_lessons=created_lessons)
+        return _ProcessLessonSchemasResult(created_lessons=created_lessons, processed_lessons=processed_lessons)
 
     async def _scrape_lesson(self, schema: LessonSchema) -> Result[tuple[Lesson, bool], MissingGroupError]:
         group = await self._group_repository.get_by_title(schema.group.title)
